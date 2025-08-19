@@ -29,8 +29,8 @@
                     {% for j in range(3) %}
                         {% if i + j < photos|length %}
                         <div class="image-wrapper">
-                            <a href="{{ url_for('view_image', filename=photos[i + j]) }}">
-                                <img src="{{ url_for('static', filename='photos/' + photos[i + j]) }}"
+                            <a href="{{ base_path + url_for('view_image', filename=photos[i + j]) }}">
+                                <img src="{{ base_path + url_for('static', filename='photos/' + photos[i + j]) }}"
                                      alt="Automotive Photography {{ i + j + 1 }}"
                                      loading="{% if i == 0 and j == 0 %}eager{% else %}lazy{% endif %}">
                             </a>

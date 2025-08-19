@@ -120,10 +120,10 @@
         }
     </style>
 </head>
-<body>
+<body data-base-path="{{ base_path }}">
     <h1>Movie Ratings Test Suite</h1>
-    <p><a href="/">Back to Main Page</a></p>
-    <p><a href="/admin">Admin Page</a></p>
+    <p><a href="{{ base_path }}/">Back to Main Page</a></p>
+    <p><a href="{{ base_path }}/admin">Admin Page</a></p>
     
     <!-- Database Status -->
     <div class="test-section">
@@ -727,6 +727,15 @@
         }
 
         // Run initial check on page load
+        const basePath = document.body.dataset.basePath || '';
+        const originalFetch = window.fetch;
+        window.fetch = (url, options, ...rest) => {
+            if (typeof url === 'string' && url.startsWith('/')) {
+                return originalFetch(basePath + url, options, ...rest);
+            }
+            return originalFetch(url, options, ...rest);
+        };
+
         window.addEventListener('DOMContentLoaded', checkDatabaseStatus);
     </script>
 </body>

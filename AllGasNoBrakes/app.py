@@ -4,7 +4,15 @@ import os
 # Define environment detection
 IS_DEVELOPMENT = os.environ.get('FLASK_ENV') == 'development'
 
+# Base path for deployment under a subdirectory
+BASE_PATH = os.environ.get('BASE_PATH', '/allgasnobrakes')
+
 app = Flask(__name__)
+
+
+@app.context_processor
+def inject_base_path():
+    return {"base_path": BASE_PATH}
 
 @app.after_request
 def add_security_headers(response):
@@ -18,8 +26,8 @@ def page_not_found(e):
     if IS_DEVELOPMENT:
         app.logger.error(f"404 error: {request.path}")
     
-    # Redirect to the index page
-    return redirect(url_for('index'))
+    # Redirect to the index page respecting base path
+    return redirect(BASE_PATH + url_for('index'))
 
 @app.route('/')
 def index():

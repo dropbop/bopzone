@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ base_path + url_for('static', filename='css/style.css') }}">
 </head>
-<body>
+<body data-base-path="{{ base_path }}">
     <div class="container">
         <h1>Admin Panel</h1>
         <p>
-            <a href="/">Main Page</a> |
-            <a href="/tests">Tests</a>
+            <a href="{{ base_path }}/">Main Page</a> |
+            <a href="{{ base_path }}/tests">Tests</a>
         </p>
         <p>
             <button type="button" id="rescale-elo-btn">Recalculate Elo</button>
@@ -22,6 +22,6 @@
         <h2>Movies</h2>
         <div id="movies"></div>
     </div>
-    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script src="{{ base_path + url_for('static', filename='js/admin.js') }}"></script>
 </body>
 </html>

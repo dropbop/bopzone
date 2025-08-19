@@ -56,10 +56,10 @@
 
 {% block body %}
 <div class="fullsize-container">
-    <img src="{{ url_for('get_photo', filename=filename) }}" alt="{{ filename }}" class="fullsize-image">
-    
+    <img src="{{ base_path + url_for('get_photo', filename=filename) }}" alt="{{ filename }}" class="fullsize-image">
+
     <div class="image-controls">
-        <a href="{{ url_for('index') }}" class="control-button">
+        <a href="{{ base_path + url_for('index') }}" class="control-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3"></path>
                 <path d="M16 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"></path>
