@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const basePath = document.body.dataset.basePath || '';
+    const originalFetch = window.fetch;
+    window.fetch = (url, options, ...rest) => {
+        if (typeof url === 'string' && url.startsWith('/')) {
+            return originalFetch(basePath + url, options, ...rest);
+        }
+        return originalFetch(url, options, ...rest);
+    };
+
     // --- Removed userSelect element reference ---
     // const userSelect = document.getElementById('user-select');
     const userButtonsContainer = document.getElementById('user-buttons'); // Get user button group

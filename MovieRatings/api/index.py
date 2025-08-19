@@ -34,6 +34,14 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
+# Base path for deployment under subdirectory
+BASE_PATH = os.environ.get('BASE_PATH', '/movieratings')
+
+
+@app.context_processor
+def inject_base_path():
+    return {"base_path": BASE_PATH}
+
 
 def _get_basic_auth_credentials():
     """Extract basic auth credentials from the request."""

@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const basePath = document.body.dataset.basePath || '';
+    const originalFetch = window.fetch;
+    window.fetch = (url, options, ...rest) => {
+        if (typeof url === 'string' && url.startsWith('/')) {
+            return originalFetch(basePath + url, options, ...rest);
+        }
+        return originalFetch(url, options, ...rest);
+    };
+
     const usersDiv = document.getElementById('users');
     const moviesDiv = document.getElementById('movies');
     const addUserBtn = document.getElementById('admin-add-user');

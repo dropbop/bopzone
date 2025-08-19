@@ -15,6 +15,14 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
+# Base path for deployment under subdirectory
+BASE_PATH = os.environ.get('BASE_PATH', '/camping')
+
+
+@app.context_processor
+def inject_base_path():
+    return {"base_path": BASE_PATH}
+
 # Define users and months
 USERS = ["Jack", "Payton", "Nick", "Alyssa"]
 MONTHS_YEAR = [(2025, m) for m in range(5, 9)]  # May to August 2025

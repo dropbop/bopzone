@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const basePath = document.body.dataset.basePath || '';
+    const originalFetch = window.fetch;
+    window.fetch = (url, options, ...rest) => {
+        if (typeof url === 'string' && url.startsWith('/')) {
+            return originalFetch(basePath + url, options, ...rest);
+        }
+        return originalFetch(url, options, ...rest);
+    };
+
     // State management
     let currentUser = 'Jack';
     let currentFilter = 'all';

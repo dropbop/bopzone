@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "AllGasNoBrakes/app.py", "use": "@vercel/python" },
+    { "src": "CampingCalendar/api/index.py", "use": "@vercel/python", "config": { "maxLambdaSize": "15mb" } },
+    { "src": "CampingCalendar/static/**", "use": "@vercel/static" },
+    { "src": "MovieRatings/api/index.py", "use": "@vercel/python", "config": { "maxLambdaSize": "15mb" } },
+    { "src": "MovieRatings/static/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/allgasnobrakes", "dest": "AllGasNoBrakes/app.py" },
+    { "src": "/allgasnobrakes/(.*)", "dest": "AllGasNoBrakes/app.py" },
+    { "src": "/camping/static/(.*)", "dest": "CampingCalendar/static/$1" },
+    { "src": "/camping", "dest": "CampingCalendar/api/index.py" },
+    { "src": "/camping/(.*)", "dest": "CampingCalendar/api/index.py" },
+    { "src": "/movieratings/static/(.*)", "dest": "MovieRatings/static/$1" },
+    { "src": "/movieratings", "dest": "MovieRatings/api/index.py" },
+    { "src": "/movieratings/(.*)", "dest": "MovieRatings/api/index.py" }
+  ]
+}
