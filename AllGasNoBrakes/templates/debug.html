@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}Debug Environment Variables{% endblock %}
+
+{% block head %}
+<style>
+    .debug-container {
+        max-width: 600px;
+        margin: 100px auto;
+        padding: 20px;
+        background-color: var(--color-surface);
+        color: var(--color-text);
+    }
+    
+    .debug-title {
+        font-family: 'Space Grotesk', sans-serif;
+        margin-bottom: 20px;
+        color: var(--color-accent);
+    }
+    
+    .debug-section {
+        margin-bottom: 30px;
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 15px;
+    }
+    
+    .variable {
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .variable-name {
+        font-weight: bold;
+    }
+    
+    .variable-value {
+        word-break: break-all;
+        color: #4ade80;
+        background: rgba(0,0,0,0.3);
+        padding: 3px 6px;
+        font-family: monospace;
+    }
+    
+    .not-found {
+        color: #f87171;
+    }
+    
+    .test-form {
+        margin-top: 20px;
+    }
+    
+    .test-button {
+        background-color: var(--color-accent);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="debug-container">
+    <h1 class="debug-title">Environment Variables Debug</h1>
+    
+    <div class="debug-section">
+        <h2>Access Key Status:</h2>
+        <div class="variable">
+            <span class="variable-name">web3forms_key:</span>
+            <span class="variable-value {% if not web3forms_key %}not-found{% endif %}">
+                {% if web3forms_key %}
+                    {{ web3forms_key|truncate(10, true) }}...
+                {% else %}
+                    Not found
+                {% endif %}
+            </span>
+        </div>
+        
+        <div class="variable">
+            <span class="variable-name">access_key in form:</span>
+            <span class="variable-value {% if not access_key_in_form %}not-found{% endif %}">
+                {% if access_key_in_form %}
+                    {{ access_key_in_form|truncate(10, true) }}...
+                {% else %}
+                    Not found
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>All Environment Variables (first 10 chars):</h2>
+        {% if env_vars %}
+            {% for name, value in env_vars.items() %}
+            <div class="variable">
+                <span class="variable-name">{{ name }}:</span>
+                <span class="variable-value">{{ value|truncate(10, true) }}...</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No environment variables available</p>
+        {% endif %}
+    </div>
+    
+    <div class="debug-section">
+        <h2>Test Form Submission</h2>
+        <div class="test-form">
+            <form id="testForm">
+                <input type="hidden" name="access_key" id="accessKeyField" value="{{ web3forms_key }}">
+                <input type="hidden" name="name" value="Debug Test">
+                <input type="hidden" name="email" value="test@example.com">
+                <input type="hidden" name="message" value="This is a test message from the debug page">
+                <button type="submit" class="test-button">Test API Submission</button>
+            </form>
+            <div id="testResult" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Manual Access Key Entry</h2>
+        <p>If your environment variable isn't working, you can manually test an access key:</p>
+        <input type="text" id="manualAccessKey" placeholder="Enter Web3Forms access key" style="width: 100%; padding: 8px; margin-top: 10px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
+        <button id="updateAccessKey" class="test-button">Update & Test</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const testForm = document.getElementById('testForm');
+    const testResult = document.getElementById('testResult');
+    const manualAccessKeyField = document.getElementById('manualAccessKey');
+    const updateAccessKeyBtn = document.getElementById('updateAccessKey');
+    const accessKeyField = document.getElementById('accessKeyField');
+    
+    // Function to test the form submission
+    function testSubmission(accessKey) {
+        testResult.innerHTML = "Testing submission...";
+        testResult.style.color = "#f59e0b"; // Amber color for pending
+        
+        const formData = new FormData();
+        formData.append('access_key', accessKey || accessKeyField.value);
+        formData.append('name', 'Debug Test');
+        formData.append('email', 'test@example.com');
+        formData.append('message', 'This is a test message from the debug page');
+        
+        const object = Object.fromEntries(formData);
+        const json = JSON.stringify(object);
+        
+        fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: json
+        })
+        .then(async (response) => {
+            let json = await response.json();
+            console.log('API Response:', json);
+            
+            if (response.status == 200) {
+                testResult.innerHTML = "✅ Success: " + json.message;
+                testResult.style.color = "#4ade80"; // Green color for success
+            } else {
+                testResult.innerHTML = "❌ Error: " + json.message;
+                testResult.style.color = "#f87171"; // Red color for error
+            }
+        })
+        .catch(error => {
+            console.log('Error:', error);
+            testResult.innerHTML = "❌ Error: Something went wrong! Check console.";
+            testResult.style.color = "#f87171"; // Red color for error
+        });
+    }
+    
+    // Test form submission
+    testForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        testSubmission();
+    });
+    
+    // Manual access key testing
+    updateAccessKeyBtn.addEventListener('click', function() {
+        const manualKey = manualAccessKeyField.value.trim();
+        if (manualKey) {
+            accessKeyField.value = manualKey;
+            testSubmission(manualKey);
+        } else {
+            testResult.innerHTML = "❌ Please enter an access key first";
+            testResult.style.color = "#f87171";
+        }
+    });
+});
+</script>
+{% endblock %}
