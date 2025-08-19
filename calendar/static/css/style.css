@@ -1,0 +1,253 @@
+body {
+    font-family: sans-serif;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    justify-content: center;
+    align-items: center; /* Center items vertically */
+    gap: 15px 30px; /* Row gap, Column gap (increased column gap) */
+    margin-bottom: 30px;
+    background-color: #fff;
+    padding: 20px; /* Increased padding */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Styling for each control group area */
+.user-select-area,
+.preference-select {
+    display: flex;
+    flex-direction: column; /* Stack label above button group */
+    align-items: center; /* Center items horizontally */
+    gap: 8px; /* Space between label and button group */
+}
+
+.controls label { /* Applies to "Your Name:" and "Preference:" */
+    font-weight: bold;
+    color: #555;
+    font-size: 0.95em;
+}
+
+/* --- Button Group Styles (Shared) --- */
+.button-group {
+    display: inline-flex; /* Makes buttons sit side-by-side */
+    border-radius: 5px;
+    overflow: hidden; /* Keeps rounded corners neat */
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Base button style within groups */
+.button-group button {
+    padding: 8px 15px;
+    border: none;
+    background-color: #f8f9fa; /* Lighter default background */
+    color: #333;
+    cursor: pointer;
+    border-right: 1px solid #ccc; /* Separator lines */
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 0.9em;
+    line-height: 1.4; /* Ensure consistent height */
+}
+
+.button-group button:last-child {
+    border-right: none; /* No border on the last button */
+}
+
+.button-group button:hover {
+    background-color: #e9ecef; /* Subtle hover */
+}
+
+/* Active state for BOTH user and preference buttons */
+.button-group button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #0056b3; /* Make border darker too */
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Specific button classes if needed in future, but base style covers it now */
+.user-button { /* Inherits from .button-group button */ }
+.pref-button { /* Inherits from .button-group button */ }
+
+
+/* --- Calendar and Day Styles (Mostly Unchanged) --- */
+
+#calendar-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns */
+    gap: 30px;
+}
+
+.month {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.day-name {
+    font-weight: bold;
+    text-align: center;
+    padding: 5px;
+    color: #555;
+    font-size: 0.9em;
+}
+
+.day {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    min-height: 60px; /* Ensure consistent height */
+    position: relative;
+    cursor: pointer;
+    background-color: #fff;
+    transition: background-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes indicators down */
+    font-size: 0.9em;
+    border-radius: 3px; /* Slight rounding */
+}
+
+.day.empty {
+    background-color: #f0f0f0; /* Match weekday slightly */
+    border: 1px solid #e0e0e0;
+    cursor: default;
+}
+
+.day:not(.empty):hover {
+    background-color: #e9f5ff;
+    border-color: #cceaff;
+}
+
+.indicators {
+    margin-top: 5px;
+    font-size: 0.7em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2px;
+    min-height: 10px; /* Reserve a little space even if empty */
+}
+
+.indicator {
+    display: inline-block;
+    padding: 1px 3px;
+    border-radius: 3px;
+    color: white;
+    font-weight: bold;
+}
+
+/* User-specific colors */
+.indicator.jack { background-color: #007bff; } /* Blue */
+.indicator.payton { background-color: #28a745; } /* Green */
+.indicator.nick { background-color: #ffc107; color: #333;} /* Yellow - text black */
+.indicator.alyssa { background-color: #dc3545; } /* Red */
+
+/* Preference specific styles within indicators */
+.indicator.prefer_not {
+   opacity: 0.25;
+}
+
+.indicator.no {
+   border: 1px solid rgba(0,0,0,0.5);
+   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+/* Message Area Styling */
+.message-area { /* Base class for default state */
+    margin-top: 20px;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    min-height: 1.5em; /* Adjusted min-height */
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+}
+
+.message-area.success { /* Added specificity */
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+.message-area.error { /* Added specificity */
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+.message-area.info { /* Added specificity */
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+}
+
+
+.day.weekday {
+    background-color: #f8f9fa;  /* Lighter gray */
+}
+
+.day.weekday:hover:not(.empty) {
+    background-color: #e9ecef;  /* Slightly darker gray on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) { /* Adjusted breakpoint */
+    .controls {
+        gap: 15px 20px; /* Slightly reduce gap */
+        padding: 15px;
+    }
+}
+
+
+@media (max-width: 600px) {
+    .controls {
+        flex-direction: column; /* Stack controls vertically */
+        align-items: stretch; /* Stretch items full width */
+        gap: 20px; /* Increase gap when stacked */
+    }
+
+    .user-select-area,
+    .preference-select {
+        align-items: center; /* Center label and button group */
+    }
+
+    .button-group {
+        width: 100%; /* Make button group take full width */
+        max-width: 400px; /* Optional: prevent excessive width on wide mobile */
+        margin: 0 auto; /* Center the group if max-width applies */
+        display: flex; /* Ensure flex properties apply */
+    }
+    .button-group button {
+        flex-grow: 1; /* Make buttons expand equally */
+        text-align: center;
+        padding: 10px 5px; /* Adjust padding for smaller buttons */
+        font-size: 0.85em;
+    }
+    #calendar-container {
+        grid-template-columns: 1fr; /* Single column for months */
+        gap: 20px;
+    }
+    .day {
+        min-height: 50px;
+        padding: 5px;
+    }
+}
