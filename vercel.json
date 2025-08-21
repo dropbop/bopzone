@@ -1,8 +1,22 @@
 {
   "version": 2,
   "builds": [
-    { "src": "movies/api/index.py", "use": "@vercel/python", "config": { "maxLambdaSize": "15mb" } },
-    { "src": "camping/api/index.py", "use": "@vercel/python", "config": { "maxLambdaSize": "15mb" } },
+    {
+      "src": "movies/api/index.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "includeFiles": ["movies/templates/**"]
+      }
+    },
+    {
+      "src": "camping/api/index.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "includeFiles": ["camping/templates/**"]
+      }
+    },
 
     { "src": "movies/static/**", "use": "@vercel/static" },
     { "src": "camping/static/**", "use": "@vercel/static" },
@@ -10,20 +24,20 @@
     { "src": "homepage/templates/**", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "^/movies/static/(.*)$", "dest": "movies/static/$1" },
-    { "src": "^/camping/static/(.*)$", "dest": "camping/static/$1" },
+    { "src": "^/movies/static/(.*)$",   "dest": "movies/static/$1" },
+    { "src": "^/camping/static/(.*)$",  "dest": "camping/static/$1" },
     { "src": "^/homepage/static/(.*)$", "dest": "homepage/static/$1" },
 
-    { "src": "^/$", "dest": "homepage/templates/index.html" },
-    { "src": "^/homepage$", "headers": { "Location": "/homepage/" }, "status": 301 },
-    { "src": "^/homepage/?$", "dest": "homepage/templates/index.html" },
+    { "src": "^/$",                     "dest": "homepage/templates/index.html" },
+    { "src": "^/homepage$",             "headers": { "Location": "/homepage/" }, "status": 301 },
+    { "src": "^/homepage/?$",           "dest": "homepage/templates/index.html" },
 
-    { "src": "^/movies$", "headers": { "Location": "/movies/" }, "status": 301 },
-    { "src": "^/camping$", "headers": { "Location": "/camping/" }, "status": 301 },
+    { "src": "^/movies$",               "headers": { "Location": "/movies/" }, "status": 301 },
+    { "src": "^/camping$",              "headers": { "Location": "/camping/" }, "status": 301 },
 
-    { "src": "^/movies/(.*)$", "dest": "movies/api/index.py" },
-    { "src": "^/camping/(.*)$", "dest": "camping/api/index.py" },
+    { "src": "^/movies/(.*)$",          "dest": "movies/api/index.py" },
+    { "src": "^/camping/(.*)$",         "dest": "camping/api/index.py" },
 
-    { "src": "^(.*)$", "dest": "homepage/templates/index.html" }
+    { "src": "^(.*)$",                  "dest": "homepage/templates/index.html" }
   ]
 }
