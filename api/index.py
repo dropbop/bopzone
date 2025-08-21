@@ -34,6 +34,24 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
+# --- Mount under /movies while keeping your existing route decorators unchanged ---
+PREFIX = os.getenv("URL_PREFIX", "/movies").rstrip("/")
+
+class PrefixMiddleware:
+    def __init__(self, app, prefix=""):
+        self.app = app
+        self.prefix = prefix
+    def __call__(self, environ, start_response):
+        path = environ.get("PATH_INFO", "")
+        if self.prefix and path.startswith(self.prefix):
+            environ["SCRIPT_NAME"] = self.prefix
+            environ["PATH_INFO"] = path[len(self.prefix):] or "/"
+        return self.app(environ, start_response)
+
+if PREFIX:
+    app.wsgi_app = PrefixMiddleware(app.wsgi_app, PREFIX)
+# -------------------------------------------------------------------------------
+
 
 def _get_basic_auth_credentials():
     """Extract basic auth credentials from the request."""

@@ -10,8 +10,8 @@
     <div class="container">
         <h1>Admin Panel</h1>
         <p>
-            <a href="/">Main Page</a> |
-            <a href="/tests">Tests</a>
+            <a href="{{ url_for('index') }}">Main Page</a> |
+            <a href="{{ url_for('tests') }}">Tests</a>
         </p>
         <p>
             <button type="button" id="rescale-elo-btn">Recalculate Elo</button>

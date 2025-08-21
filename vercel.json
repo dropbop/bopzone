@@ -17,8 +17,18 @@
         "dest": "/static/$1"
       },
       {
-        "src": "/(.*)",
+        "src": "^/movies$",
+        "headers": { "Location": "/movies/" },
+        "status": 301
+      },
+      {
+        "src": "/movies/(.*)",
         "dest": "api/index.py"
+      },
+      {
+        "src": "^/$",
+        "headers": { "Location": "/movies/" },
+        "status": 301
       }
     ]
-  }
+}
