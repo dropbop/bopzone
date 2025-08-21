@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Prefix-aware API helper (works at /movies/* and locally)
+    const APP_PREFIX = '/' + window.location.pathname.split('/')[1]; // "/movies"
+    const api = (p) => `${APP_PREFIX}/${p.replace(/^\/+/, '')}`;
+
     const usersDiv = document.getElementById('users');
     const moviesDiv = document.getElementById('movies');
     const addUserBtn = document.getElementById('admin-add-user');
@@ -12,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const pass = prompt('Admin password:');
         if (!user || !pass) return false;
         authHeader = { 'Authorization': 'Basic ' + btoa(`${user}:${pass}`) };
-        const resp = await fetch('/admin/api/users', { headers: authHeader });
+        const resp = await fetch(api('admin/api/users'), { headers: authHeader });
         if (!resp.ok) {
             alert('Invalid admin credentials');
             authHeader = null;
@@ -23,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadUsers() {
         if (!await ensureAdmin()) return;
-        const resp = await fetch('/admin/api/users', { headers: authHeader });
+        const resp = await fetch(api('admin/api/users'), { headers: authHeader });
         const users = await resp.json();
         usersDiv.innerHTML = '';
         moviesDiv.innerHTML = '';
@@ -38,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             del.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 if (!confirm('Delete user and all movies?')) return;
-                const r = await fetch('/admin/api/users/' + encodeURIComponent(u), {
+                const r = await fetch(api('admin/api/users/' + encodeURIComponent(u)), {
                     method: 'DELETE',
                     headers: authHeader
                 });
@@ -50,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.stopPropagation();
                 const np = prompt('New password for ' + u + ':');
                 if (!np) return;
-                await fetch('/admin/api/users/' + encodeURIComponent(u), {
+                await fetch(api('admin/api/users/' + encodeURIComponent(u)), {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', ...authHeader },
                     body: JSON.stringify({ password: np })
@@ -64,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadMovies() {
         if (!currentUser) return;
-        const resp = await fetch(`/api/movies?user=${encodeURIComponent(currentUser)}`);
+        const resp = await fetch(api(`api/movies?user=${encodeURIComponent(currentUser)}`));
         const movies = await resp.json();
         moviesDiv.innerHTML = `<h3>Movies for ${currentUser}</h3>`;
         movies.forEach(m => {
@@ -81,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const save = document.createElement('button');
             save.textContent = 'Save';
             save.addEventListener('click', async () => {
-                await fetch('/admin/api/movies/' + m.id, {
+                await fetch(api('admin/api/movies/' + m.id), {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', ...authHeader },
                     body: JSON.stringify({ movie_title: title.value, initial_rating: select.value })
@@ -102,13 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!name || !name.trim()) return;
             const pwd = prompt('Enter password:');
             if (!pwd) return;
-            const resp = await fetch('/register', {
+            const resp = await fetch(api('register'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_name: name.trim(), password: pwd })
             });
             if (!resp.ok) {
-                const data = await resp.json();
+                const data = await resp.json().catch(() => ({}));
                 alert(data.error || 'Failed to register user');
                 return;
             }
@@ -120,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rescaleBtn.addEventListener('click', async () => {
             if (!await ensureAdmin()) return;
             if (!confirm('Rescale all Elo ratings?')) return;
-            const resp = await fetch('/admin/api/rescale_elos', {
+            const resp = await fetch(api('admin/api/rescale_elos'), {
                 method: 'POST',
                 headers: authHeader
             });

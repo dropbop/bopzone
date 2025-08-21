@@ -4,128 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Ratings - Test Suite</title>
+    <!-- Ensure relative URLs resolve from the app root -->
+    <base href="{{ url_for('index') }}">
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        .test-section {
-            background: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-        }
-        h2 {
-            color: #34495e;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 10px;
-        }
-        button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        button:hover {
-            background: #2980b9;
-        }
-        button.danger {
-            background: #e74c3c;
-        }
-        button.danger:hover {
-            background: #c0392b;
-        }
-        button.success {
-            background: #27ae60;
-        }
-        button.success:hover {
-            background: #229954;
-        }
-        .result {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .result.success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        }
-        .result.error {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-        .result.info {
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
-            color: #0c5460;
-        }
-        input[type="text"], input[type="number"], select {
-            padding: 8px;
-            margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .test-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-            margin: 10px 0;
-        }
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        .status-indicator.green {
-            background: #27ae60;
-        }
-        .status-indicator.red {
-            background: #e74c3c;
-        }
-        .movie-list-test {
-            display: grid;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .movie-item-test {
-            padding: 10px;
-            background: #ecf0f1;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+        .test-section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        h2 { color: #34495e; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        button { background: #3498db; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #2980b9; }
+        button.danger { background: #e74c3c; }
+        button.danger:hover { background: #c0392b; }
+        button.success { background: #27ae60; }
+        button.success:hover { background: #229954; }
+        .result { margin-top: 10px; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .result.success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .result.error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .result.info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        input[type="text"], input[type="number"], select { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .test-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 10px 0; }
+        .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        .status-indicator.green { background: #27ae60; }
+        .status-indicator.red { background: #e74c3c; }
+        .movie-list-test { display: grid; gap: 10px; margin-top: 10px; }
+        .movie-item-test { padding: 10px; background: #ecf0f1; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
     <h1>Movie Ratings Test Suite</h1>
     <p><a href="{{ url_for('index') }}">Back to Main Page</a></p>
     <p><a href="{{ url_for('admin_page') }}">Admin Page</a></p>
-    
-    <!-- Database Status -->
+
     <div class="test-section">
         <h2>1. Database Status & Initialization</h2>
         <button onclick="checkDatabaseStatus()">Check Database Status</button>
@@ -133,7 +42,6 @@
         <div id="db-status-result" class="result"></div>
     </div>
 
-    <!-- Authentication -->
     <div class="test-section">
         <h2>2. Authentication</h2>
         <div class="test-controls">
@@ -145,7 +53,6 @@
         <div id="auth-result" class="result"></div>
     </div>
 
-    <!-- Add Movie Tests -->
     <div class="test-section">
         <h2>3. Add Movie Tests</h2>
         <div class="test-controls">
@@ -166,7 +73,6 @@
         <div id="add-movie-result" class="result"></div>
     </div>
 
-    <!-- User Management Tests -->
     <div class="test-section">
         <h2>4. User Management Tests</h2>
         <div class="test-controls">
@@ -177,7 +83,6 @@
         <div id="user-mgmt-result" class="result"></div>
     </div>
 
-    <!-- Get Movies & Sorting Tests -->
     <div class="test-section">
         <h2>5. Get Movies & Filter Tests</h2>
         <div class="test-controls">
@@ -198,7 +103,6 @@
         <div id="get-movies-result" class="result"></div>
     </div>
 
-    <!-- ELO Update Tests -->
     <div class="test-section">
         <h2>6. ELO Rating Update Tests</h2>
         <div class="test-controls">
@@ -210,7 +114,6 @@
         <div id="elo-update-result" class="result"></div>
     </div>
 
-    <!-- Delete Movie Tests -->
     <div class="test-section">
         <h2>7. Delete Movie Tests</h2>
         <div class="test-controls">
@@ -220,7 +123,6 @@
         <div id="delete-result" class="result"></div>
     </div>
 
-    <!-- Comprehensive Test -->
     <div class="test-section">
         <h2>8. Comprehensive Test Suite</h2>
         <button onclick="runAllTests()" class="success">Run All Tests</button>
@@ -229,7 +131,10 @@
     </div>
 
     <script>
-        // Utility function to display results
+        // Prefix-aware base from <base href="...">, e.g. "/movies/"
+        const APP_PREFIX = new URL(document.querySelector('base')?.href || '/').pathname.replace(/\/$/, '');
+        const api = (p) => `${APP_PREFIX}/${p.replace(/^\/+/, '')}`;
+
         function showResult(elementId, message, type = 'info') {
             const resultDiv = document.getElementById(elementId);
             resultDiv.className = `result ${type}`;
@@ -247,22 +152,16 @@
         async function registerUser() {
             const user = document.getElementById('auth-username').value;
             const pass = document.getElementById('auth-password').value;
-            if (!user || !pass) {
-                showResult('auth-result', 'Username and password required', 'error');
-                return;
-            }
+            if (!user || !pass) return showResult('auth-result', 'Username and password required', 'error');
             try {
-                const resp = await fetch('/register', {
+                const resp = await fetch(api('register'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_name: user, password: pass })
                 });
                 const data = await resp.json();
-                if (resp.ok) {
-                    showResult('auth-result', 'Registered successfully', 'success');
-                } else {
-                    showResult('auth-result', data.error || 'Registration failed', 'error');
-                }
+                if (resp.ok) showResult('auth-result', 'Registered successfully', 'success');
+                else showResult('auth-result', data.error || 'Registration failed', 'error');
             } catch (err) {
                 showResult('auth-result', `Error: ${err.message}`, 'error');
             }
@@ -271,12 +170,9 @@
         async function loginUser() {
             const user = document.getElementById('auth-username').value;
             const pass = document.getElementById('auth-password').value;
-            if (!user || !pass) {
-                showResult('auth-result', 'Username and password required', 'error');
-                return false;
-            }
+            if (!user || !pass) { showResult('auth-result', 'Username and password required', 'error'); return false; }
             try {
-                const resp = await fetch('/login', {
+                const resp = await fetch(api('login'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ user_name: user, password: pass })
@@ -297,24 +193,16 @@
             }
         }
 
-        // 1. Database Status Check
         async function checkDatabaseStatus() {
             try {
-                const response = await fetch('/database-status');
+                const response = await fetch(api('database-status'));
                 const data = await response.json();
-                
                 let statusMsg = `Database Status: ${data.status}\n`;
                 statusMsg += `Movie Table Exists: ${data.movie_table_exists ? 'YES' : 'NO'}\n`;
                 statusMsg += `User Table Exists: ${data.user_table_exists ? 'YES' : 'NO'}\n`;
                 statusMsg += `Movie Count: ${data.movie_count || 0}\n`;
-
-                if (!data.movie_table_exists) {
-                    statusMsg += '\nMovie table does not exist! Click "Initialize Movie Tables" to create it.';
-                }
-                if (!data.user_table_exists) {
-                    statusMsg += '\nUsers table does not exist!';
-                }
-
+                if (!data.movie_table_exists) statusMsg += '\nMovie table does not exist! Click "Initialize Movie Tables" to create it.';
+                if (!data.user_table_exists) statusMsg += '\nUsers table does not exist!';
                 const success = data.movie_table_exists && data.user_table_exists;
                 showResult('db-status-result', statusMsg, success ? 'success' : 'error');
             } catch (error) {
@@ -322,16 +210,13 @@
             }
         }
 
-        // Initialize Database
         async function initializeDatabase() {
             try {
                 showResult('db-status-result', 'Initializing database...', 'info');
-                const response = await fetch('/init-movie-database');
+                const response = await fetch(api('init-movie-database'));
                 const data = await response.json();
-                
                 if (response.ok) {
                     showResult('db-status-result', 'Database initialized successfully!', 'success');
-                    // Check status again
                     setTimeout(checkDatabaseStatus, 1000);
                 } else {
                     showResult('db-status-result', `Error: ${data.message}`, 'error');
@@ -341,30 +226,19 @@
             }
         }
 
-        // 2. Test Add Movie
         async function testAddMovie() {
             const user = document.getElementById('test-user').value;
             const title = document.getElementById('test-movie-title').value;
             const rating = document.getElementById('test-rating').value;
-            
             try {
-                const response = await fetch('/api/movies', {
+                const response = await fetch(api('api/movies'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', ...authHeaders(currentUser) },
-                    body: JSON.stringify({
-                        user_name: user,
-                        movie_title: title,
-                        initial_rating: rating
-                    })
+                    body: JSON.stringify({ user_name: user, movie_title: title, initial_rating: rating })
                 });
-                
                 const data = await response.json();
-                
                 if (response.ok) {
-                    showResult('add-movie-result', 
-                        `Success! Added movie:\n${JSON.stringify(data.movie, null, 2)}`, 
-                        'success'
-                    );
+                    showResult('add-movie-result', `Success! Added movie:\n${JSON.stringify(data.movie, null, 2)}`, 'success');
                 } else {
                     showResult('add-movie-result', `Error: ${data.error || data.message}`, 'error');
                 }
@@ -373,7 +247,6 @@
             }
         }
 
-        // Add Multiple Test Movies
         async function addMultipleTestMovies() {
             const testMovies = [
                 { title: "The Shawshank Redemption", rating: "thumbs_up" },
@@ -382,164 +255,91 @@
                 { title: "The Room", rating: "thumbs_down" },
                 { title: "Pulp Fiction", rating: "thumbs_up" }
             ];
-            
             const user = document.getElementById('test-user').value;
             let results = [];
-            
             for (const movie of testMovies) {
                 try {
-                    const response = await fetch('/api/movies', {
+                    const response = await fetch(api('api/movies'), {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', ...authHeaders(currentUser) },
-                        body: JSON.stringify({
-                            user_name: user,
-                            movie_title: movie.title,
-                            initial_rating: movie.rating
-                        })
+                        body: JSON.stringify({ user_name: user, movie_title: movie.title, initial_rating: movie.rating })
                     });
-                    
                     const data = await response.json();
-                    results.push({
-                        movie: movie.title,
-                        success: response.ok,
-                        data: data
-                    });
+                    results.push({ movie: movie.title, success: response.ok, data });
                 } catch (error) {
-                    results.push({
-                        movie: movie.title,
-                        success: false,
-                        error: error.message
-                    });
+                    results.push({ movie: movie.title, success: false, error: error.message });
                 }
             }
-            
             showResult('add-movie-result', results, 'info');
         }
 
-        // 3. Test User Management
         function testAddUser() {
             const userName = document.getElementById('new-user-name').value;
-            if (!userName) {
-                showResult('user-mgmt-result', 'Please enter a user name', 'error');
-                return;
-            }
-            
-            // Simulate what the main app does
+            if (!userName) return showResult('user-mgmt-result', 'Please enter a user name', 'error');
             const message = `To add a user in the main app:\n`;
-            const steps = `1. Click "+ Add User" button\n`;
-            const steps2 = `2. Enter name: "${userName}"\n`;
-            const steps3 = `3. New button will appear with this name\n\n`;
+            const steps = `1. Click "+ Add User" button\n2. Enter name: "${userName}"\n3. New button will appear with this name\n\n`;
             const note = `Note: Users are not stored in database, only in UI session.`;
-            
-            showResult('user-mgmt-result', message + steps + steps2 + steps3 + note, 'info');
+            showResult('user-mgmt-result', message + steps + note, 'info');
         }
 
         async function testUserSwitching() {
             const users = ['Jack', 'TestUser', 'Alice'];
             let results = [];
-            
             for (const user of users) {
                 try {
-                    const response = await fetch(`/api/movies?user=${user}`, {
-                        headers: { ...authHeaders(currentUser) }
-                    });
+                    const response = await fetch(api(`api/movies?user=${encodeURIComponent(user)}`), { headers: { ...authHeaders(currentUser) } });
                     const movies = await response.json();
-                    results.push({
-                        user: user,
-                        movieCount: movies.length,
-                        movies: movies.slice(0, 3).map(m => m.movie_title)
-                    });
+                    results.push({ user, movieCount: movies.length, movies: movies.slice(0, 3).map(m => m.movie_title) });
                 } catch (error) {
-                    results.push({
-                        user: user,
-                        error: error.message
-                    });
+                    results.push({ user, error: error.message });
                 }
             }
-            
             showResult('user-mgmt-result', results, 'info');
         }
 
-        // 4. Test Get Movies
         async function testGetMovies() {
             const user = document.getElementById('fetch-user').value;
             const category = document.getElementById('fetch-category').value;
-            
             try {
-                let url = `/api/movies?user=${user}`;
-                if (category) {
-                    url += `&category=${category}`;
-                }
-                
-                const response = await fetch(url, {
-                    headers: { ...authHeaders(currentUser) }
-                });
+                const url = api('api/movies?user=' + encodeURIComponent(user) + (category ? '&category=' + encodeURIComponent(category) : ''));
+                const response = await fetch(url, { headers: { ...authHeaders(currentUser) } });
                 const movies = await response.json();
-                
-                // Display in list
                 const listContainer = document.getElementById('movie-list-container');
                 listContainer.innerHTML = '';
-                
                 movies.forEach((movie, index) => {
                     const movieEl = document.createElement('div');
                     movieEl.className = 'movie-item-test';
                     movieEl.innerHTML = `
-                        <div>
-                            <strong>#${index + 1}</strong> ${movie.movie_title}
-                            <span style="color: #666;">(ID: ${movie.id})</span>
-                        </div>
-                        <div>
-                            ELO: ${movie.elo_rating} |
-                             Rating: ${(Math.floor((movie.elo_rating / 1000) * 10) / 10).toFixed(1)} |
-                            ${movie.initial_rating}
-                        </div>
+                        <div><strong>#${index + 1}</strong> ${movie.movie_title} <span style="color: #666;">(ID: ${movie.id})</span></div>
+                        <div>ELO: ${movie.elo_rating} | Rating: ${(Math.floor((movie.elo_rating / 1000) * 10) / 10).toFixed(1)} | ${movie.initial_rating}</div>
                     `;
                     listContainer.appendChild(movieEl);
                 });
-                
-                showResult('get-movies-result', 
-                    `Found ${movies.length} movies for ${user}${category ? ` (${category})` : ''}`, 
-                    'success'
-                );
+                showResult('get-movies-result', `Found ${movies.length} movies for ${user}${category ? ` (${category})` : ''}`, 'success');
             } catch (error) {
                 showResult('get-movies-result', `Error: ${error.message}`, 'error');
             }
         }
 
-        // 5. Test Update ELO
         async function testUpdateElo() {
             const movieId = document.getElementById('movie-id').value;
             const newElo = document.getElementById('new-elo').value;
-            
-            if (!movieId) {
-                showResult('elo-update-result', 'Please enter a movie ID', 'error');
-                return;
-            }
-            
+            if (!movieId) return showResult('elo-update-result', 'Please enter a movie ID', 'error');
             try {
-                const response = await fetch(`/api/movies/${movieId}`, {
+                const response = await fetch(api(`api/movies/${movieId}`), {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', ...authHeaders(currentUser) },
                     body: JSON.stringify({ elo_rating: parseInt(newElo) })
                 });
-                
                 const data = await response.json();
-                
-                if (response.ok) {
-                    showResult('elo-update-result', 
-                        `Success! Updated movie ${movieId} to ELO ${newElo}`, 
-                        'success'
-                    );
-                } else {
-                    showResult('elo-update-result', `Error: ${data.error}`, 'error');
-                }
+                if (response.ok) showResult('elo-update-result', `Success! Updated movie ${movieId} to ELO ${newElo}`, 'success');
+                else showResult('elo-update-result', `Error: ${data.error}`, 'error');
             } catch (error) {
                 showResult('elo-update-result', `Error: ${error.message}`, 'error');
             }
         }
 
         function testBinaryComparison() {
-            // Simulate binary comparison logic
             const simulation = `Binary Comparison Algorithm Test:\n\n`;
             const movies = [
                 { title: "Movie A", elo: 4200 },
@@ -548,18 +348,12 @@
                 { title: "Movie D", elo: 3200 },
                 { title: "Movie E", elo: 2800 }
             ];
-            
             const newMovie = { title: "New Movie", elo: 3600 };
             let comparisons = [];
-            
-            // Simulate binary search
-            let low = 0, high = movies.length - 1;
-            let comparisonCount = 0;
-            
+            let low = 0, high = movies.length - 1, comparisonCount = 0;
             while (low <= high) {
                 comparisonCount++;
                 let mid = Math.floor((low + high) / 2);
-                
                 if (newMovie.elo > movies[mid].elo) {
                     comparisons.push(`Comparison ${comparisonCount}: ${newMovie.title} > ${movies[mid].title}`);
                     high = mid - 1;
@@ -568,62 +362,41 @@
                     low = mid + 1;
                 }
             }
-            
-            const result = simulation + 
+            const result = simulation +
                 `Movies in category (sorted by ELO):\n${movies.map(m => `  ${m.title}: ${m.elo}`).join('\n')}\n\n` +
                 `New movie to place: ${newMovie.title} (${newMovie.elo})\n\n` +
                 `Binary search comparisons:\n${comparisons.join('\n')}\n\n` +
                 `Total comparisons needed: ${comparisonCount}\n` +
                 `Final position: Between ${movies[low-1]?.title || 'start'} and ${movies[low]?.title || 'end'}`;
-            
             showResult('elo-update-result', result, 'info');
         }
 
-        // 6. Test Delete Movie
         async function testDeleteMovie() {
             const movieId = document.getElementById('delete-movie-id').value;
-            
-            if (!movieId) {
-                showResult('delete-result', 'Please enter a movie ID', 'error');
-                return;
-            }
-            
-            if (!confirm(`Are you sure you want to delete movie ${movieId}?`)) {
-                return;
-            }
-            
+            if (!movieId) return showResult('delete-result', 'Please enter a movie ID', 'error');
+            if (!confirm(`Are you sure you want to delete movie ${movieId}?`)) return;
             try {
-                const response = await fetch(`/api/movies/${movieId}`, {
+                const response = await fetch(api(`api/movies/${movieId}`), {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json', ...authHeaders(currentUser) }
                 });
-                
                 const data = await response.json();
-                
-                if (response.ok) {
-                    showResult('delete-result', `Success! Deleted movie ${movieId}`, 'success');
-                } else {
-                    showResult('delete-result', `Error: ${data.error}`, 'error');
-                }
+                if (response.ok) showResult('delete-result', `Success! Deleted movie ${movieId}`, 'success');
+                else showResult('delete-result', `Error: ${data.error}`, 'error');
             } catch (error) {
                 showResult('delete-result', `Error: ${error.message}`, 'error');
             }
         }
 
-        // 7. Run All Tests
         async function runAllTests() {
             let results = [];
             showResult('comprehensive-result', 'Running all tests...', 'info');
 
             const loggedIn = await loginUser();
-            if (!loggedIn) {
-                showResult('comprehensive-result', 'Login failed. Cannot run tests.', 'error');
-                return;
-            }
-            
-            // Test 1: Database Status
+            if (!loggedIn) { showResult('comprehensive-result', 'Login failed. Cannot run tests.', 'error'); return; }
+
             try {
-                const dbResponse = await fetch('/database-status');
+                const dbResponse = await fetch(api('database-status'));
                 const dbData = await dbResponse.json();
                 results.push({
                     test: 'Database Status',
@@ -631,16 +404,11 @@
                     details: dbData
                 });
             } catch (error) {
-                results.push({
-                    test: 'Database Status',
-                    passed: false,
-                    error: error.message
-                });
+                results.push({ test: 'Database Status', passed: false, error: error.message });
             }
-            
-            // Test 2: Add Movie
+
             try {
-                const addResponse = await fetch('/api/movies', {
+                const addResponse = await fetch(api('api/movies'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', ...authHeaders(currentUser) },
                     body: JSON.stringify({
@@ -650,64 +418,38 @@
                     })
                 });
                 const addData = await addResponse.json();
-                results.push({
-                    test: 'Add Movie',
-                    passed: addResponse.ok,
-                    details: addData
-                });
+                results.push({ test: 'Add Movie', passed: addResponse.ok, details: addData });
             } catch (error) {
-                results.push({
-                    test: 'Add Movie',
-                    passed: false,
-                    error: error.message
-                });
+                results.push({ test: 'Add Movie', passed: false, error: error.message });
             }
-            
-            // Test 3: Get Movies
+
             try {
-                const getResponse = await fetch('/api/movies?user=TestUser', {
+                const getResponse = await fetch(api('api/movies?user=TestUser'), {
                     headers: { ...authHeaders(currentUser) }
                 });
                 const movies = await getResponse.json();
-                results.push({
-                    test: 'Get Movies',
-                    passed: Array.isArray(movies),
-                    movieCount: movies.length
-                });
+                results.push({ test: 'Get Movies', passed: Array.isArray(movies), movieCount: movies.length });
             } catch (error) {
-                results.push({
-                    test: 'Get Movies',
-                    passed: false,
-                    error: error.message
-                });
+                results.push({ test: 'Get Movies', passed: false, error: error.message });
             }
-            
-            // Display results
+
             const summary = results.map(r => `${r.passed ? 'PASS' : 'FAIL'} ${r.test}`).join('\n');
             const details = JSON.stringify(results, null, 2);
-            
-            showResult('comprehensive-result', 
-                `Test Summary:\n${summary}\n\nDetailed Results:\n${details}`, 
+            showResult('comprehensive-result',
+                `Test Summary:\n${summary}\n\nDetailed Results:\n${details}`,
                 results.every(r => r.passed) ? 'success' : 'error'
             );
         }
 
-        // Cleanup Test Data
         async function cleanupTestData() {
-            if (!confirm('This will delete all TestUser movies. Continue?')) {
-                return;
-            }
-            
+            if (!confirm('This will delete all TestUser movies. Continue?')) return;
             try {
-                const response = await fetch('/api/movies?user=TestUser', {
-                    headers: { ...authHeaders(currentUser) }
-                });
+                const response = await fetch(api('api/movies?user=TestUser'), { headers: { ...authHeaders(currentUser) } });
                 const movies = await response.json();
-                
                 let deleted = 0;
                 for (const movie of movies) {
                     try {
-                        await fetch(`/api/movies/${movie.id}`, {
+                        await fetch(api(`api/movies/${movie.id}`), {
                             method: 'DELETE',
                             headers: { 'Content-Type': 'application/json', ...authHeaders(currentUser) }
                         });
@@ -716,17 +458,12 @@
                         console.error(`Failed to delete movie ${movie.id}`);
                     }
                 }
-                
-                showResult('comprehensive-result', 
-                    `Cleanup complete. Deleted ${deleted} test movies.`, 
-                    'success'
-                );
+                showResult('comprehensive-result', `Cleanup complete. Deleted ${deleted} test movies.`, 'success');
             } catch (error) {
                 showResult('comprehensive-result', `Cleanup error: ${error.message}`, 'error');
             }
         }
 
-        // Run initial check on page load
         window.addEventListener('DOMContentLoaded', checkDatabaseStatus);
     </script>
 </body>

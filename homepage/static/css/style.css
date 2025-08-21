@@ -1,1 +1,20 @@
-empty
+:root { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #f6f7f9; color: #1f2937; }
+.wrap {
+  max-width: 720px;
+  margin: 12vh auto;
+  padding: 2rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+h1 { margin: 0 0 0.5rem; font-weight: 650; }
+.links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; }
+.links a {
+  text-decoration: none;
+  padding: 0.6rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+.links a:hover { background: #f3f4f6; }
