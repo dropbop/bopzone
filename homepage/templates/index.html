@@ -1,21 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Home</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>UNLICENSED CONTROL ROOM</title>
   <link rel="stylesheet" href="/homepage/static/css/style.css"/>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-  <main class="wrap">
-    <h1>Welcome</h1>
-    <p>This is a placeholder homepage served from the monorepo.</p>
-    <nav class="links">
-      <a href="/movies/">Movies App</a>
-      <a href="/camping/">Camping App</a>
-      <a href="/homepage/">Homepage</a>
-    </nav>
+  <header class="statusbar" role="banner" aria-label="System status">
+    <div class="left">
+      <span class="badge">UNLICENSED</span>
+      <span class="brand">CONTROL ROOM</span>
+      <span class="sep"></span>
+      <span class="led green on" title="RUN"></span><span class="label">RUN</span>
+      <span class="led amber on blink" title="MAINT"></span><span class="label">MAINT</span>
+      <span id="alarm-led" class="led red" title="ALARM"></span><span class="label">ALARM</span>
+    </div>
+    <div class="right">
+      <span class="build">BUILD: 1998‑AESTHETIC</span>
+      <span class="sep"></span>
+      <span id="clock" class="clock">00:00:00</span>
+    </div>
+  </header>
+
+  <main class="grid" role="main">
+    <!-- LIVE FEED (blank by request) -->
+    <section class="panel span2">
+      <div class="panel-head">
+        <div class="title">[LIVE ROOM] FEED <span class="tag">CH‑01</span></div>
+        <div class="indicators"><span class="lit">SYNC</span><span class="lit warn">REPLAY</span><span class="lit alarm">OFFLINE</span></div>
+      </div>
+      <div class="panel-body"><div class="feed" role="img" aria-label="Blank live feed"></div></div>
+    </section>
+
+    <!-- PROCESS READOUTS -->
+    <section class="panel">
+      <div class="panel-head"><div class="title">Process Readouts <span class="tag">LCD</span></div><div class="indicators"><span class="lit">OK</span></div></div>
+      <div class="panel-body">
+        <div class="lcd">
+          <div class="cell"><div class="label">CO₂ ppm</div><div id="v-co2" class="value">0000</div></div>
+          <div class="cell"><div class="label">Temp °C</div><div id="v-temp" class="value">00.0</div></div>
+          <div class="cell"><div class="label">Humidity %</div><div id="v-hum" class="value">00</div></div>
+          <div class="cell"><div class="label">Fan RPM</div><div id="v-rpm" class="value">0000</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTROLS -->
+    <section class="panel">
+      <div class="panel-head"><div class="title">Controls <span class="tag">MAN</span></div><div class="indicators"><span class="lit">LOCAL</span><span class="lit warn">BYP</span></div></div>
+      <div class="panel-body">
+        <div class="toolbar">
+          <button id="btn-alarm" class="btn95">Ack Alarm</button>
+          <button id="btn-test" class="btn95">Lamp Test</button>
+          <label class="switch"><input id="sw-run" type="checkbox" checked><span>RUN</span></label>
+          <label class="switch warn"><input id="sw-maint" type="checkbox" checked><span>MAINT</span></label>
+          <label class="switch alarm"><input id="sw-alarm" type="checkbox"><span>ALARM</span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLOTLY SCATTER (theme-matched) -->
+    <section class="panel span2">
+      <div class="panel-head"><div class="title">Scatter Monitor <span class="tag">PLOT</span></div><div class="indicators"><span class="lit">ONLINE</span></div></div>
+      <div class="panel-body"><div id="plotly-scat" class="plot"></div></div>
+    </section>
+
+    <!-- EVENT LOG -->
+    <section class="panel span3">
+      <div class="panel-head"><div class="title">Event Log <span class="tag">SYS</span></div><div class="indicators"><span class="lit">SCROLL</span></div></div>
+      <div class="panel-body"><div id="log" class="log">
+        <div class="row"><span class="ts">00:00:01</span><span class="sev OK">OK</span><span>Cold start — build 1998‑AESTHETIC</span></div>
+        <div class="row"><span class="ts">00:00:02</span><span class="sev OK">OK</span><span>UNLICENSED mode enabled</span></div>
+        <div class="row"><span class="ts">00:00:03</span><span class="sev WARN">WARN</span><span>Feed CH‑01 offline (demo)</span></div>
+      </div></div>
+    </section>
   </main>
+
+  <div class="stamp" title="The Unlicense">UNLICENSED • BUILT BY HAND</div>
   <script src="/homepage/static/js/script.js"></script>
 </body>
 </html>
