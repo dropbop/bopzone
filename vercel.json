@@ -1,43 +1,32 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "builds": [
-    {
-      "src": "movies/api/index.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "15mb",
-        "includeFiles": ["movies/templates/**"]
-      }
-    },
-    {
-      "src": "camping/api/index.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "15mb",
-        "includeFiles": ["camping/templates/**"]
-      }
-    },
 
-    { "src": "movies/static/**", "use": "@vercel/static" },
-    { "src": "camping/static/**", "use": "@vercel/static" },
+  "builds": [
     { "src": "homepage/static/**", "use": "@vercel/static" },
     { "src": "homepage/templates/**", "use": "@vercel/static" }
   ],
-  "routes": [
-    { "src": "^/movies/static/(.*)$",   "dest": "movies/static/$1" },
-    { "src": "^/camping/static/(.*)$",  "dest": "camping/static/$1" },
-    { "src": "^/homepage/static/(.*)$", "dest": "homepage/static/$1" },
 
-    { "src": "^/$",                     "dest": "homepage/templates/index.html" },
-    { "src": "^/homepage$",             "headers": { "Location": "/homepage/" }, "status": 301 },
-    { "src": "^/homepage/?$",           "dest": "homepage/templates/index.html" },
+  "redirects": [
+    { "source": "/homepage", "destination": "/homepage/", "permanent": true }
+  ],
 
-    { "src": "^/movies$",               "headers": { "Location": "/movies/" }, "status": 301 },
-    { "src": "^/camping$",              "headers": { "Location": "/camping/" }, "status": 301 },
+  "rewrites": [
+    /* --- path-owned apps living in their own projects --- */
+    { "source": "/camping/:path*", "destination": "https://camping.dropbop.xyz/camping/:path*" },
+    { "source": "/movies/:path*",  "destination": "https://movies.dropbop.xyz/movies/:path*"  },
 
-    { "src": "^/movies/(.*)$",          "dest": "movies/api/index.py" },
-    { "src": "^/camping/(.*)$",         "dest": "camping/api/index.py" },
+    /* --- homepage --- */
+    { "source": "/homepage/", "destination": "/homepage/templates/index.html" },
+    { "source": "/",          "destination": "/homepage/templates/index.html" }
+  ],
 
-    { "src": "^(.*)$",                  "dest": "homepage/templates/index.html" }
+  "headers": [
+    {
+      "source": "/homepage/static/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
   ]
 }
