@@ -12,11 +12,9 @@
   ],
 
   "rewrites": [
-    /* --- path-owned apps living in their own projects --- */
     { "source": "/camping/:path*", "destination": "https://camping.dropbop.xyz/camping/:path*" },
     { "source": "/movies/:path*",  "destination": "https://movies.dropbop.xyz/movies/:path*"  },
 
-    /* --- homepage --- */
     { "source": "/homepage/", "destination": "/homepage/templates/index.html" },
     { "source": "/",          "destination": "/homepage/templates/index.html" }
   ],
