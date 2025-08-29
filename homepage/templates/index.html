@@ -3,82 +3,204 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>UNLICENSED CONTROL ROOM</title>
-  <link rel="stylesheet" href="/homepage/static/css/style.css"/>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <title>SCADA System - Plant Overview</title>
+  <link rel="stylesheet" href="/homepage/static/css/style.css">
 </head>
 <body>
-  <header class="statusbar" role="banner" aria-label="System status">
+  <!-- Title Bar -->
+  <div class="titlebar" role="banner" aria-label="Application title">
     <div class="left">
-      <span class="badge">UNLICENSED</span>
-      <span class="brand">CONTROL ROOM</span>
-      <span class="sep"></span>
-      <span class="led green on" title="RUN"></span><span class="label">RUN</span>
-      <span class="led amber on blink" title="MAINT"></span><span class="label">MAINT</span>
-      <span id="alarm-led" class="led red" title="ALARM"></span><span class="label">ALARM</span>
+      <div class="system-icon" aria-hidden="true"></div>
+      <span>SCADA System v2.1 - Plant Overview</span>
     </div>
-    <div class="right">
-      <span class="build">BUILD: 1998‑AESTHETIC</span>
-      <span class="sep"></span>
-      <span id="clock" class="clock">00:00:00</span>
-    </div>
-  </header>
+    <div>Station: OFFICE-01 | Node: LOCAL</div>
+  </div>
 
-  <main class="grid" role="main">
-    <!-- LIVE FEED (blank by request) -->
-    <section class="panel span2">
-      <div class="panel-head">
-        <div class="title">[LIVE ROOM] FEED <span class="tag">CH‑01</span></div>
-        <div class="indicators"><span class="lit">SYNC</span><span class="lit warn">REPLAY</span><span class="lit alarm">OFFLINE</span></div>
+  <!-- Toolbar -->
+  <div class="toolbar" role="navigation" aria-label="Main toolbar">
+    <button class="toolbar-btn">Overview</button>
+    <button class="toolbar-btn">Trends</button>
+    <button class="toolbar-btn">Alarms</button>
+    <button class="toolbar-btn">Reports</button>
+    <div class="toolbar-sep" aria-hidden="true"></div>
+    <button class="toolbar-btn">Config</button>
+    <button class="toolbar-btn">Manual</button>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container" role="main">
+    <!-- Environmental Sensors -->
+    <div class="panel">
+      <div class="panel-title">
+        <span>Environmental Monitor - Office</span>
+        <span style="font-size: 9px;">LIVE</span>
       </div>
-      <div class="panel-body"><div class="feed" role="img" aria-label="Blank live feed"></div></div>
-    </section>
-
-    <!-- PROCESS READOUTS -->
-    <section class="panel">
-      <div class="panel-head"><div class="title">Process Readouts <span class="tag">LCD</span></div><div class="indicators"><span class="lit">OK</span></div></div>
       <div class="panel-body">
-        <div class="lcd">
-          <div class="cell"><div class="label">CO₂ ppm</div><div id="v-co2" class="value">0000</div></div>
-          <div class="cell"><div class="label">Temp °C</div><div id="v-temp" class="value">00.0</div></div>
-          <div class="cell"><div class="label">Humidity %</div><div id="v-hum" class="value">00</div></div>
-          <div class="cell"><div class="label">Fan RPM</div><div id="v-rpm" class="value">0000</div></div>
+        <div class="sensor-grid">
+          <div class="sensor" aria-live="polite">
+            <div class="sensor-label">CO2 Level</div>
+            <div class="sensor-value">
+              <span id="co2">0742</span>
+              <span class="sensor-unit">ppm</span>
+            </div>
+          </div>
+          <div class="sensor" aria-live="polite">
+            <div class="sensor-label">Temperature</div>
+            <div class="sensor-value">
+              <span id="temp">23.5</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+          </div>
+          <div class="sensor" aria-live="polite">
+            <div class="sensor-label">Humidity</div>
+            <div class="sensor-value">
+              <span id="humidity">45.2</span>
+              <span class="sensor-unit">%RH</span>
+            </div>
+          </div>
+          <div class="sensor">
+            <div class="sensor-label">AC Status</div>
+            <div class="sensor-value">
+              <span id="ac-status">AUTO</span>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- CONTROLS -->
-    <section class="panel">
-      <div class="panel-head"><div class="title">Controls <span class="tag">MAN</span></div><div class="indicators"><span class="lit">LOCAL</span><span class="lit warn">BYP</span></div></div>
+    <!-- System Status -->
+    <div class="panel">
+      <div class="panel-title">System Status</div>
       <div class="panel-body">
-        <div class="toolbar">
-          <button id="btn-alarm" class="btn95">Ack Alarm</button>
-          <button id="btn-test" class="btn95">Lamp Test</button>
-          <label class="switch"><input id="sw-run" type="checkbox" checked><span>RUN</span></label>
-          <label class="switch warn"><input id="sw-maint" type="checkbox" checked><span>MAINT</span></label>
-          <label class="switch alarm"><input id="sw-alarm" type="checkbox"><span>ALARM</span></label>
+        <div class="led-panel">
+          <div class="led-group" aria-label="COMM status">
+            <div class="led green-on" aria-hidden="true"></div>
+            <span class="led-label">COMM</span>
+          </div>
+          <div class="led-group" aria-label="ESP32 status">
+            <div class="led green-on" aria-hidden="true"></div>
+            <span class="led-label">ESP32</span>
+          </div>
+          <div class="led-group" aria-label="AC-1 status">
+            <div class="led yellow-on" aria-hidden="true"></div>
+            <span class="led-label">AC-1</span>
+          </div>
+          <div class="led-group" aria-label="Alarm status">
+            <div class="led" aria-hidden="true"></div>
+            <span class="led-label">ALARM</span>
+          </div>
+          <div class="led-group" aria-label="Web status">
+            <div class="led green-on" aria-hidden="true"></div>
+            <span class="led-label">WEB</span>
+          </div>
+          <div class="led-group" aria-label="Database status">
+            <div class="led green-on" aria-hidden="true"></div>
+            <span class="led-label">DB</span>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- PLOTLY SCATTER (theme-matched) -->
-    <section class="panel span2">
-      <div class="panel-head"><div class="title">Scatter Monitor <span class="tag">PLOT</span></div><div class="indicators"><span class="lit">ONLINE</span></div></div>
-      <div class="panel-body"><div id="plotly-scat" class="plot"></div></div>
-    </section>
+    <!-- Project Access Panel -->
+    <div class="panel wide">
+      <div class="panel-title">Project Systems</div>
+      <div class="panel-body">
+        <div class="project-grid">
+          <a href="/car-portfolio" class="project-btn">
+            <div class="project-icon" aria-hidden="true"></div>
+            <div>CAR PHOTOS</div>
+            <div style="font-size: 8px; margin-top: 2px;">Portfolio</div>
+          </a>
+          <a href="/esp32-monitor" class="project-btn">
+            <div class="project-icon" aria-hidden="true"></div>
+            <div>ESP32</div>
+            <div style="font-size: 8px; margin-top: 2px;">Monitor</div>
+          </a>
+          <a href="/project-3" class="project-btn">
+            <div class="project-icon" aria-hidden="true"></div>
+            <div>SYSTEM-3</div>
+            <div style="font-size: 8px; margin-top: 2px;">Offline</div>
+          </a>
+          <a href="/project-4" class="project-btn">
+            <div class="project-icon" aria-hidden="true"></div>
+            <div>SYSTEM-4</div>
+            <div style="font-size: 8px; margin-top: 2px;">Standby</div>
+          </a>
+        </div>
+      </div>
+    </div>
 
-    <!-- EVENT LOG -->
-    <section class="panel span3">
-      <div class="panel-head"><div class="title">Event Log <span class="tag">SYS</span></div><div class="indicators"><span class="lit">SCROLL</span></div></div>
-      <div class="panel-body"><div id="log" class="log">
-        <div class="row"><span class="ts">00:00:01</span><span class="sev OK">OK</span><span>Cold start — build 1998‑AESTHETIC</span></div>
-        <div class="row"><span class="ts">00:00:02</span><span class="sev OK">OK</span><span>UNLICENSED mode enabled</span></div>
-        <div class="row"><span class="ts">00:00:03</span><span class="sev WARN">WARN</span><span>Feed CH‑01 offline (demo)</span></div>
-      </div></div>
-    </section>
-  </main>
+    <!-- Alarm Summary -->
+    <div class="panel wide">
+      <div class="panel-title">
+        <span>Alarm Summary</span>
+        <span style="font-size: 9px;">0 ACTIVE</span>
+      </div>
+      <div class="panel-body">
+        <div class="alarm-list" role="log" aria-live="polite">
+          <div class="alarm-row normal">
+            <span>08:45:12</span>
+            <span>NORMAL</span>
+            <span>System startup complete</span>
+          </div>
+          <div class="alarm-row normal">
+            <span>08:45:15</span>
+            <span>INFO</span>
+            <span>ESP32 connection established</span>
+          </div>
+          <div class="alarm-row warning">
+            <span>09:12:34</span>
+            <span>WARN</span>
+            <span>CO2 level above 700ppm</span>
+          </div>
+          <div class="alarm-row normal">
+            <span>09:13:01</span>
+            <span>NORMAL</span>
+            <span>AC unit activated (AUTO)</span>
+          </div>
+          <div class="alarm-row normal">
+            <span>09:25:44</span>
+            <span>NORMAL</span>
+            <span>CO2 level normalized</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <div class="stamp" title="The Unlicense">UNLICENSED • BUILT BY HAND</div>
-  <script src="/homepage/static/js/script.js"></script>
+    <!-- Trend Display -->
+    <div class="panel wide">
+      <div class="panel-title">24-Hour Trend - CO2/Temperature</div>
+      <div class="panel-body">
+        <div class="trend-chart" role="img" aria-label="CO2/Temperature trend (demo)">
+          <div class="trend-grid" aria-hidden="true"></div>
+          <canvas id="trend-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simple Mimic -->
+    <div class="panel">
+      <div class="panel-title">AC Control Mimic</div>
+      <div class="panel-body">
+        <div class="mimic" aria-label="Process mimic (demo)">
+          <div class="pipe h" style="top: 50px; left: 20px; width: 60px;"></div>
+          <div class="pump running" style="top: 35px; left: 80px;">P1</div>
+          <div class="pipe h" style="top: 50px; left: 110px; width: 60px;"></div>
+          <div class="pipe v" style="top: 50px; left: 170px; height: 40px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div class="statusbar" role="contentinfo" aria-label="Status bar">
+    <div class="status-field">Mode: RUN</div>
+    <div class="status-field">User: OPERATOR</div>
+    <div class="status-field">Scan: 1000ms</div>
+    <div class="status-field status-time" id="clock">00:00:00</div>
+  </div>
+
+  <script src="/homepage/static/js/script.js" defer></script>
+  <noscript>JavaScript required for live values & trend.</noscript>
 </body>
 </html>
