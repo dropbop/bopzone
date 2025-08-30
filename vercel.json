@@ -8,13 +8,16 @@
   "redirects": [
     { "source": "/homepage", "destination": "/homepage/", "permanent": true },
     { "source": "/camping",  "destination": "/camping/",  "permanent": true },
-    { "source": "/movies",   "destination": "/movies/",   "permanent": true }
+    { "source": "/movies",   "destination": "/movies/",   "permanent": true },
+    { "source": "/allgasnobrakes", "destination": "/allgasnobrakes/", "permanent": true }
   ],
   "rewrites": [
     { "source": "/camping/",       "destination": "https://camping.dropbop.xyz/" },
     { "source": "/camping/:path*", "destination": "https://camping.dropbop.xyz/:path*" },
     { "source": "/movies/",        "destination": "https://movies.dropbop.xyz/" },
     { "source": "/movies/:path*",  "destination": "https://movies.dropbop.xyz/:path*" },
+    { "source": "/allgasnobrakes/",       "destination": "https://allgasnobrakes.dropbop.xyz/" },
+    { "source": "/allgasnobrakes/:path*", "destination": "https://allgasnobrakes.dropbop.xyz/:path*" },
     { "source": "/homepage/", "destination": "/homepage/templates/index.html" },
     { "source": "/",          "destination": "/homepage/templates/index.html" }
   ],
