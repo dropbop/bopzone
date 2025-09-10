@@ -9,8 +9,10 @@ It’s written so you can follow it without access to any specific codebase. It 
 
 ## Objective
 
-- Ensure CSS/JS assets and API calls load correctly when the app is hosted at a non-root path (like `/camping/`).
-- Keep the same app also working when hosted at the root of its own subdomain.
+- Preferred: host apps under a subpath (e.g., `/camping/`) via rewrites/proxy and make them base-path aware so assets and API calls work correctly.
+- Also support the same app at the root of its own subdomain when needed.
+
+This guide is subpath-first: the examples and checklist focus on making apps work reliably when mounted under a base path. Redirecting to a subdomain is treated as a fallback when a sub-app cannot be made base-path aware.
 
 
 ## Why Things Break Under a Subpath
@@ -22,16 +24,16 @@ If the sub-app uses root-absolute URLs like `/assets/...` or `/api/...`, the bro
 The fix is to make the sub-app “base-path aware.”
 
 
-## Quick Decision: Redirect vs. Rewrite
+## Strategy: Subpath vs. Subdomain
 
-Pick one per project:
+Pick one per project (subpath preferred):
 
-- Easiest: link/redirect to the subdomain (no base-path issues)
-  - Example: `https://camping.example.com/` instead of `/camping/`.
-  - If you currently rewrite `/camping/:path*` → subdomain, switch to a redirect so the browser actually lands on the subdomain (root-absolute `/assets` then works).
+- Preferred: keep the app under the main site at `/project/` (base-path aware)
+  - Continue using rewrites/proxy at `/project/` and ensure the sub-app uses relative asset paths and prefix-aware API calls (instructions below). The rest of this guide focuses on this approach.
 
-- Keep `/project/` under the main site (requires base-path awareness)
-  - Continue using rewrites/proxy at `/project` and ensure the sub-app uses relative asset paths and prefix-aware API calls (instructions below).
+- Fallback: link/redirect to the subdomain (avoids base-path issues)
+  - Example: link to `https://camping.example.com/` instead of `/camping/`.
+  - If you currently rewrite `/project/:path*` → subdomain, switching to a redirect ensures the browser lands on the subdomain so root-absolute `/assets` works. Use this only when you cannot modify the sub-app to be base-path aware.
 
 
 ## How To Make a Sub-App Base-Path Aware
@@ -257,4 +259,3 @@ const api = (p) => `${PREFIX}/${String(p).replace(/^\/+/, '')}`;
 ```
 
 Stick to relative assets, prefix your API calls, avoid `<base href="/">`, and set your framework’s base path if you use a bundler.
-
