@@ -1,32 +1,6 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "builds": [
-    { "src": "homepage/static/**", "use": "@vercel/static" },
-    { "src": "homepage/templates/**", "use": "@vercel/static" }
-  ],
-  "redirects": [
-    { "source": "/homepage", "destination": "/homepage/", "permanent": true },
-    { "source": "/camping",  "destination": "/camping/",  "permanent": true },
-    { "source": "/movies",   "destination": "/movies/",   "permanent": true },
-    { "source": "/allgasnobrakes", "destination": "/allgasnobrakes/", "permanent": true }
-  ],
   "rewrites": [
-    { "source": "/camping/",       "destination": "https://camping.dropbop.xyz/" },
-    { "source": "/camping/:path*", "destination": "https://camping.dropbop.xyz/:path*" },
-    { "source": "/movies/",        "destination": "https://movies.dropbop.xyz/" },
-    { "source": "/movies/:path*",  "destination": "https://movies.dropbop.xyz/:path*" },
-    { "source": "/allgasnobrakes/",       "destination": "https://allgasnobrakes.xyz/" },
-    { "source": "/allgasnobrakes/:path*", "destination": "https://allgasnobrakes.xyz/:path*" },
-    { "source": "/homepage/", "destination": "/homepage/templates/index.html" },
-    { "source": "/",          "destination": "/homepage/templates/index.html" }
-  ],
-  "headers": [
-    {
-      "source": "/homepage/static/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
-    }
+    { "source": "/", "destination": "/templates/index.html" }
   ]
 }
