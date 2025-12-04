@@ -16,8 +16,8 @@
     { "source": "/camping/:path*", "destination": "https://camping.dropbop.xyz/:path*" },
     { "source": "/movies/",        "destination": "https://movies.dropbop.xyz/" },
     { "source": "/movies/:path*",  "destination": "https://movies.dropbop.xyz/:path*" },
-    { "source": "/allgasnobrakes/",       "destination": "https://allgasnobrakes.dropbop.xyz/" },
-    { "source": "/allgasnobrakes/:path*", "destination": "https://allgasnobrakes.dropbop.xyz/:path*" },
+    { "source": "/allgasnobrakes/",       "destination": "https://allgasnobrakes.xyz/" },
+    { "source": "/allgasnobrakes/:path*", "destination": "https://allgasnobrakes.xyz/:path*" },
     { "source": "/homepage/", "destination": "/homepage/templates/index.html" },
     { "source": "/",          "destination": "/homepage/templates/index.html" }
   ],
