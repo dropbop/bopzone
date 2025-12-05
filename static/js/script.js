@@ -51,6 +51,20 @@
     if (humidityEl && latest.humidity != null) {
       humidityEl.textContent = latest.humidity.toFixed(1);
     }
+
+    // Update last update timestamp (converted to US Central Time)
+    const lastUpdateEl = document.getElementById('last-update');
+    if (lastUpdateEl && latest.ts) {
+      const d = new Date(latest.ts);
+      const opts = { timeZone: 'America/Chicago' };
+      const month = pad2(Number(d.toLocaleString('en-US', { ...opts, month: 'numeric' })));
+      const day = pad2(Number(d.toLocaleString('en-US', { ...opts, day: 'numeric' })));
+      const year = d.toLocaleString('en-US', { ...opts, year: '2-digit' });
+      const hour = Number(d.toLocaleString('en-US', { ...opts, hour: 'numeric', hour12: true }));
+      const minute = pad2(Number(d.toLocaleString('en-US', { ...opts, minute: 'numeric' })));
+      const ampm = d.toLocaleString('en-US', { ...opts, hour: 'numeric', hour12: true }).slice(-2).toLowerCase().charAt(0);
+      lastUpdateEl.textContent = `${month}/${day}/${year} ${hour}:${minute}${ampm}`;
+    }
   }
 
   function setLedStatus(name, isOn) {
