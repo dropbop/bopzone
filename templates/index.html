@@ -51,21 +51,21 @@
           <div class="sensor" aria-live="polite">
             <div class="sensor-label">CO2 Level</div>
             <div class="sensor-value">
-              <span id="co2">0742</span>
+              <span id="co2">----</span>
               <span class="sensor-unit">ppm</span>
             </div>
           </div>
           <div class="sensor" aria-live="polite">
             <div class="sensor-label">Temperature</div>
             <div class="sensor-value">
-              <span id="temp">23.5</span>
+              <span id="temp">--.-</span>
               <span class="sensor-unit">°C</span>
             </div>
           </div>
           <div class="sensor" aria-live="polite">
             <div class="sensor-label">Humidity</div>
             <div class="sensor-value">
-              <span id="humidity">45.2</span>
+              <span id="humidity">--.-</span>
               <span class="sensor-unit">%RH</span>
             </div>
           </div>
@@ -89,7 +89,7 @@
             <span class="led-label">COMM</span>
           </div>
           <div class="led-group" aria-label="ESP32 status">
-            <div class="led green-on" aria-hidden="true"></div>
+            <div class="led" aria-hidden="true"></div>
             <span class="led-label">ESP32</span>
           </div>
           <div class="led-group" aria-label="AC-1 status">
@@ -100,50 +100,30 @@
             <div class="led" aria-hidden="true"></div>
             <span class="led-label">ALARM</span>
           </div>
-          <div class="led-group" aria-label="Web status">
+          <div class="led-group" aria-label="WEB status">
             <div class="led green-on" aria-hidden="true"></div>
             <span class="led-label">WEB</span>
           </div>
-          <div class="led-group" aria-label="Database status">
-            <div class="led green-on" aria-hidden="true"></div>
+          <div class="led-group" aria-label="DB status">
+            <div class="led" aria-hidden="true"></div>
             <span class="led-label">DB</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Alarm Summary -->
+    <!-- Alarm Summary - Now Dynamic -->
     <div class="panel wide">
       <div class="panel-title">
         <span>Alarm Summary</span>
-        <span style="font-size: 9px;">0 ACTIVE</span>
+        <span style="font-size: 9px;">0 ACTIVE | <a href="https://www.dropbop.xyz/api/sensor/log?device=office&hours=24" style="color: inherit;">RAW</a></span>
       </div>
       <div class="panel-body">
-        <div class="alarm-list" role="log" aria-live="polite">
+        <div id="alarm-list" class="alarm-list" role="log" aria-live="polite">
           <div class="alarm-row normal">
-            <span>08:45:12</span>
-            <span>NORMAL</span>
-            <span>System startup complete</span>
-          </div>
-          <div class="alarm-row normal">
-            <span>08:45:15</span>
+            <span>--:--:--</span>
             <span>INFO</span>
-            <span>ESP32 connection established</span>
-          </div>
-          <div class="alarm-row warning">
-            <span>09:12:34</span>
-            <span>WARN</span>
-            <span>CO2 level above 700ppm</span>
-          </div>
-          <div class="alarm-row normal">
-            <span>09:13:01</span>
-            <span>NORMAL</span>
-            <span>AC unit activated (AUTO)</span>
-          </div>
-          <div class="alarm-row normal">
-            <span>09:25:44</span>
-            <span>NORMAL</span>
-            <span>CO2 level normalized</span>
+            <span>Loading events...</span>
           </div>
         </div>
       </div>

@@ -4,8 +4,10 @@
   const API_BASE = '/api/sensor';
   const DEVICE = 'office';
   const POLL_INTERVAL = 60000; // refresh every 60 seconds
+  const EVENT_POLL_INTERVAL = 30000; // refresh events every 30 seconds
 
   let sensorData = [];
+  let eventData = [];
 
   function pad2(n) { return String(n).padStart(2, '0'); }
 
@@ -14,6 +16,12 @@
     if (!el) return;
     const now = new Date();
     el.textContent = `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())}`;
+  }
+
+  function formatTimestamp(isoString) {
+    const d = new Date(isoString);
+    const central = new Date(d.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+    return `${pad2(central.getHours())}:${pad2(central.getMinutes())}:${pad2(central.getSeconds())}`;
   }
 
   async function fetchSensorData() {
@@ -30,6 +38,119 @@
       setLedStatus('esp32', false);
       setLedStatus('db', false);
     }
+  }
+
+  async function fetchEvents() {
+    try {
+      const res = await fetch(`${API_BASE}/log?device=${DEVICE}&hours=24&limit=50`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      eventData = await res.json();
+      updateEventDisplay();
+      updateEventLed();
+    } catch (err) {
+      console.error('Event fetch error:', err);
+    }
+  }
+
+  function updateEventDisplay() {
+    const alarmList = document.getElementById('alarm-list');
+    if (!alarmList) return;
+
+    // Clear existing content
+    alarmList.innerHTML = '';
+
+    if (eventData.length === 0) {
+      alarmList.innerHTML = `
+        <div class="alarm-row normal">
+          <span>--:--:--</span>
+          <span>INFO</span>
+          <span>No events in the last 24 hours</span>
+        </div>
+      `;
+      return;
+    }
+
+    // eventData is already sorted DESC by the API, but we want to show newest first
+    // Limit to 20 most recent for display
+    const displayEvents = eventData.slice(0, 20);
+
+    displayEvents.forEach(event => {
+      const row = document.createElement('div');
+      row.className = `alarm-row ${getEventClass(event.event_type)}`;
+      
+      const timeSpan = document.createElement('span');
+      timeSpan.textContent = formatTimestamp(event.ts);
+      
+      const typeSpan = document.createElement('span');
+      typeSpan.textContent = event.event_type.toUpperCase();
+      
+      const msgSpan = document.createElement('span');
+      msgSpan.textContent = event.message;
+      msgSpan.title = `Uptime: ${formatUptime(event.uptime)} | Heap: ${event.heap} bytes | Measurements: ${event.total_measurements}`;
+      
+      row.appendChild(timeSpan);
+      row.appendChild(typeSpan);
+      row.appendChild(msgSpan);
+      alarmList.appendChild(row);
+    });
+  }
+
+  function getEventClass(eventType) {
+    switch (eventType) {
+      case 'critical': return 'critical';
+      case 'error': return 'critical';
+      case 'warning': return 'warning';
+      default: return 'normal';
+    }
+  }
+
+  function formatUptime(seconds) {
+    if (seconds == null) return 'N/A';
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    if (hours > 0) {
+      return `${hours}h ${mins}m ${secs}s`;
+    } else if (mins > 0) {
+      return `${mins}m ${secs}s`;
+    }
+    return `${secs}s`;
+  }
+
+  function updateEventLed() {
+    // Check for recent errors/critical events (last hour)
+    const oneHourAgo = new Date(Date.now() - 3600000);
+    const recentCritical = eventData.some(e => 
+      (e.event_type === 'critical' || e.event_type === 'error') && 
+      new Date(e.ts) > oneHourAgo
+    );
+    
+    const alarmLed = document.querySelector('[aria-label="Alarm status"] .led');
+    if (alarmLed) {
+      alarmLed.classList.remove('green-on', 'red-on', 'yellow-on');
+      if (recentCritical) {
+        alarmLed.classList.add('red-on');
+      }
+    }
+
+    // Update alarm count in panel title
+    const alarmTitle = document.querySelector('.panel .panel-title span:last-child');
+    const activeAlarms = eventData.filter(e => 
+      (e.event_type === 'critical' || e.event_type === 'error') && 
+      new Date(e.ts) > oneHourAgo
+    ).length;
+    
+    // Find the alarm panel title and update count
+    const alarmPanels = document.querySelectorAll('.panel-title');
+    alarmPanels.forEach(panel => {
+      if (panel.textContent.includes('Alarm Summary')) {
+        const countSpan = panel.querySelector('span:last-child');
+        if (countSpan) {
+          countSpan.textContent = `${activeAlarms} ACTIVE`;
+          countSpan.style.color = activeAlarms > 0 ? '#ff0000' : 'inherit';
+        }
+      }
+    });
   }
 
   function updateSensorDisplay() {
@@ -255,9 +376,11 @@
 
     // Initial fetch
     fetchSensorData();
+    fetchEvents();
 
     // Poll for updates
     setInterval(fetchSensorData, POLL_INTERVAL);
+    setInterval(fetchEvents, EVENT_POLL_INTERVAL);
 
     // Resize handling
     window.addEventListener('resize', drawTrend);
