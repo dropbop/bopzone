@@ -56,13 +56,14 @@
     const lastUpdateEl = document.getElementById('last-update');
     if (lastUpdateEl && latest.ts) {
       const d = new Date(latest.ts);
-      const opts = { timeZone: 'America/Chicago' };
-      const month = pad2(Number(d.toLocaleString('en-US', { ...opts, month: 'numeric' })));
-      const day = pad2(Number(d.toLocaleString('en-US', { ...opts, day: 'numeric' })));
-      const year = d.toLocaleString('en-US', { ...opts, year: '2-digit' });
-      const hour = Number(d.toLocaleString('en-US', { ...opts, hour: 'numeric', hour12: true }));
-      const minute = pad2(Number(d.toLocaleString('en-US', { ...opts, minute: 'numeric' })));
-      const ampm = d.toLocaleString('en-US', { ...opts, hour: 'numeric', hour12: true }).slice(-2).toLowerCase().charAt(0);
+      const central = new Date(d.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+      const month = pad2(central.getMonth() + 1);
+      const day = pad2(central.getDate());
+      const year = String(central.getFullYear()).slice(-2);
+      let hour = central.getHours();
+      const ampm = hour >= 12 ? 'p' : 'a';
+      hour = hour % 12 || 12;
+      const minute = pad2(central.getMinutes());
       lastUpdateEl.textContent = `${month}/${day}/${year} ${hour}:${minute}${ampm}`;
     }
   }
