@@ -98,10 +98,3 @@ def init_database():
         return jsonify({"error": str(e)}), 500
     finally:
         conn.close()
-```
-
-**`requirements.txt`**:
-```
-Flask>=2.0
-psycopg2-binary>=2.9
-python-dotenv>=0.19
