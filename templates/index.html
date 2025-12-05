@@ -29,6 +29,17 @@
 
   <!-- Main Container -->
   <div class="container" role="main">
+    <!-- Trend Display -->
+    <div class="panel wide">
+      <div class="panel-title">24-Hour Trend - CO2/Temperature</div>
+      <div class="panel-body">
+        <div class="trend-chart" role="img" aria-label="CO2/Temperature trend (demo)">
+          <div class="trend-grid" aria-hidden="true"></div>
+          <canvas id="trend-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
     <!-- Environmental Sensors -->
     <div class="panel">
       <div class="panel-title">
@@ -101,35 +112,6 @@
       </div>
     </div>
 
-    <!-- Project Access Panel -->
-    <div class="panel wide">
-      <div class="panel-title">Project Systems</div>
-      <div class="panel-body">
-        <div class="project-grid">
-          <a href="https://allgasnobrakes.xyz/" class="project-btn">
-            <div class="project-icon" aria-hidden="true"></div>
-            <div>CAR PHOTOS</div>
-            <div style="font-size: 8px; margin-top: 2px;">Portfolio</div>
-          </a>
-          <a href="https://github.com/dropbop" class="project-btn">
-            <div class="project-icon" aria-hidden="true"></div>
-            <div>GITHUB</div>
-            <div style="font-size: 8px; margin-top: 2px;">Projects</div>
-          </a>
-          <a href="https://camping.dropbop.xyz/" class="project-btn">
-            <div class="project-icon" aria-hidden="true"></div>
-            <div>CAMPING</div>
-            <div style="font-size: 8px; margin-top: 2px;">Offline</div>
-          </a>
-          <a href="https://movies.dropbop.xyz/" class="project-btn">
-            <div class="project-icon" aria-hidden="true"></div>
-            <div>MOVIES</div>
-            <div style="font-size: 8px; margin-top: 2px;">Standby</div>
-          </a>
-        </div>
-      </div>
-    </div>
-
     <!-- Alarm Summary -->
     <div class="panel wide">
       <div class="panel-title">
@@ -167,17 +149,6 @@
       </div>
     </div>
 
-    <!-- Trend Display -->
-    <div class="panel wide">
-      <div class="panel-title">24-Hour Trend - CO2/Temperature</div>
-      <div class="panel-body">
-        <div class="trend-chart" role="img" aria-label="CO2/Temperature trend (demo)">
-          <div class="trend-grid" aria-hidden="true"></div>
-          <canvas id="trend-canvas"></canvas>
-        </div>
-      </div>
-    </div>
-
     <!-- Simple Mimic -->
     <div class="panel">
       <div class="panel-title">AC Control Mimic</div>
@@ -187,6 +158,35 @@
           <div class="pump running" style="top: 35px; left: 80px;">P1</div>
           <div class="pipe h" style="top: 50px; left: 110px; width: 60px;"></div>
           <div class="pipe v" style="top: 50px; left: 170px; height: 40px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project Access Panel -->
+    <div class="panel">
+      <div class="panel-title">Project Systems</div>
+      <div class="panel-body">
+        <div class="project-grid">
+          <a href="https://allgasnobrakes.xyz/" class="project-btn">
+            <div class="project-icon" aria-hidden="true"></div>
+            <div>CAR PHOTOS</div>
+            <div style="font-size: 8px; margin-top: 2px;">Portfolio</div>
+          </a>
+          <a href="https://github.com/dropbop" class="project-btn">
+            <div class="project-icon" aria-hidden="true"></div>
+            <div>GITHUB</div>
+            <div style="font-size: 8px; margin-top: 2px;">Projects</div>
+          </a>
+          <a href="https://camping.dropbop.xyz/" class="project-btn">
+            <div class="project-icon" aria-hidden="true"></div>
+            <div>CAMPING</div>
+            <div style="font-size: 8px; margin-top: 2px;">Offline</div>
+          </a>
+          <a href="https://movies.dropbop.xyz/" class="project-btn">
+            <div class="project-icon" aria-hidden="true"></div>
+            <div>MOVIES</div>
+            <div style="font-size: 8px; margin-top: 2px;">Standby</div>
+          </a>
         </div>
       </div>
     </div>
