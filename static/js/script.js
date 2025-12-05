@@ -64,7 +64,7 @@
       const ampm = hour >= 12 ? 'p' : 'a';
       hour = hour % 12 || 12;
       const minute = pad2(central.getMinutes());
-      lastUpdateEl.textContent = `${month}/${day}/${year} ${hour}:${minute}${ampm}`;
+      lastUpdateEl.textContent = `${hour}:${minute}${ampm}`;
     }
   }
 
