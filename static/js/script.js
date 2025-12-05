@@ -179,6 +179,60 @@
     ctx.fillText('■ Temp (°C)', padding.left + 80, 12);
   }
 
+  function openPopup(title) {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+
+    // Create window
+    const popup = document.createElement('div');
+    popup.className = 'popup-window';
+
+    // Create titlebar
+    const titlebar = document.createElement('div');
+    titlebar.className = 'popup-titlebar';
+    titlebar.innerHTML = `<span>${title}</span>`;
+
+    // Create close button
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'popup-close';
+    closeBtn.textContent = '×';
+    closeBtn.onclick = () => overlay.remove();
+    titlebar.appendChild(closeBtn);
+
+    // Create body
+    const body = document.createElement('div');
+    body.className = 'popup-body';
+
+    popup.appendChild(titlebar);
+    popup.appendChild(body);
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
+
+    // Close on overlay click (not popup itself)
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+
+    // Close on Escape key
+    const escHandler = (e) => {
+      if (e.key === 'Escape') {
+        overlay.remove();
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+  }
+
+  function initToolbarButtons() {
+    const buttons = document.querySelectorAll('.toolbar-btn[data-popup]');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        openPopup(btn.dataset.popup);
+      });
+    });
+  }
+
   function init() {
     updateClock();
     setInterval(updateClock, 1000);
@@ -192,6 +246,9 @@
     // Resize handling
     window.addEventListener('resize', drawTrend);
     window.addEventListener('orientationchange', drawTrend);
+
+    // Toolbar popup buttons
+    initToolbarButtons();
   }
 
   if (document.readyState === 'loading') {
