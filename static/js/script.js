@@ -1,6 +1,12 @@
 (() => {
   'use strict';
 
+  const API_BASE = '/api/sensor';
+  const DEVICE = 'office';
+  const POLL_INTERVAL = 60000; // refresh every 60 seconds
+
+  let sensorData = [];
+
   function pad2(n) { return String(n).padStart(2, '0'); }
 
   function updateClock() {
@@ -10,13 +16,50 @@
     el.textContent = `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())}`;
   }
 
-  function updateSensors() {
-    const co2 = document.getElementById('co2');
-    const temp = document.getElementById('temp');
-    const humidity = document.getElementById('humidity');
-    if (co2) co2.textContent = String(Math.floor(Math.random() * 400 + 600)).padStart(4, '0');
-    if (temp) temp.textContent = (Math.random() * 5 + 21).toFixed(1);
-    if (humidity) humidity.textContent = (Math.random() * 20 + 40).toFixed(1);
+  async function fetchSensorData() {
+    try {
+      const res = await fetch(`${API_BASE}?device=${DEVICE}&hours=24`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      sensorData = await res.json();
+      updateSensorDisplay();
+      drawTrend();
+      setLedStatus('esp32', sensorData.length > 0);
+      setLedStatus('db', true);
+    } catch (err) {
+      console.error('Fetch error:', err);
+      setLedStatus('esp32', false);
+      setLedStatus('db', false);
+    }
+  }
+
+  function updateSensorDisplay() {
+    if (sensorData.length === 0) return;
+    
+    // Get most recent reading
+    const latest = sensorData[sensorData.length - 1];
+    
+    const co2El = document.getElementById('co2');
+    const tempEl = document.getElementById('temp');
+    const humidityEl = document.getElementById('humidity');
+    
+    if (co2El && latest.co2 != null) {
+      co2El.textContent = String(latest.co2).padStart(4, '0');
+    }
+    if (tempEl && latest.temp != null) {
+      tempEl.textContent = latest.temp.toFixed(1);
+    }
+    if (humidityEl && latest.humidity != null) {
+      humidityEl.textContent = latest.humidity.toFixed(1);
+    }
+  }
+
+  function setLedStatus(name, isOn) {
+    const led = document.querySelector(`[aria-label="${name.toUpperCase()} status"] .led`);
+    if (!led) return;
+    led.classList.remove('green-on', 'red-on', 'yellow-on');
+    if (isOn) {
+      led.classList.add('green-on');
+    }
   }
 
   function drawTrend() {
@@ -28,7 +71,6 @@
     const widthCSS = parent.clientWidth || 300;
     const heightCSS = parent.clientHeight || 200;
 
-    // Set the canvas size accounting for device pixel ratio for crisp lines
     canvas.width = Math.max(1, Math.floor(widthCSS * dpr));
     canvas.height = Math.max(1, Math.floor(heightCSS * dpr));
     canvas.style.width = widthCSS + 'px';
@@ -37,35 +79,117 @@
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Reset transform then scale for DPR
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
-
-    // Clear
     ctx.clearRect(0, 0, widthCSS, heightCSS);
 
-    // Simple trend line with a bit of noise
-    ctx.strokeStyle = '#00ff00';
+    if (sensorData.length < 2) {
+      // No data yet - show placeholder text
+      ctx.fillStyle = '#00ff00';
+      ctx.font = '12px "Courier New", monospace';
+      ctx.fillText('Waiting for sensor data...', 10, heightCSS / 2);
+      return;
+    }
+
+    const padding = { top: 20, right: 60, bottom: 30, left: 50 };
+    const chartWidth = widthCSS - padding.left - padding.right;
+    const chartHeight = heightCSS - padding.top - padding.bottom;
+
+    // Extract CO2 values and find range
+    const co2Values = sensorData.map(d => d.co2).filter(v => v != null);
+    const tempValues = sensorData.map(d => d.temp).filter(v => v != null);
+    
+    const co2Min = Math.min(...co2Values) - 50;
+    const co2Max = Math.max(...co2Values) + 50;
+    const tempMin = Math.min(...tempValues) - 2;
+    const tempMax = Math.max(...tempValues) + 2;
+
+    // Draw axes
+    ctx.strokeStyle = '#004400';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    for (let x = 0; x < widthCSS; x += 5) {
-      const y = heightCSS / 2 + Math.sin(x * 0.02) * (heightCSS * 0.15) + Math.random() * 10;
-      if (x === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
+    ctx.moveTo(padding.left, padding.top);
+    ctx.lineTo(padding.left, heightCSS - padding.bottom);
+    ctx.lineTo(widthCSS - padding.right, heightCSS - padding.bottom);
     ctx.stroke();
+
+    // Y-axis labels (CO2 - left side)
+    ctx.fillStyle = '#00ff00';
+    ctx.font = '9px "Courier New", monospace';
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 4; i++) {
+      const val = co2Min + (co2Max - co2Min) * (i / 4);
+      const y = heightCSS - padding.bottom - (chartHeight * i / 4);
+      ctx.fillText(Math.round(val) + '', padding.left - 5, y + 3);
+    }
+
+    // Y-axis labels (Temp - right side)
+    ctx.fillStyle = '#ff6600';
+    ctx.textAlign = 'left';
+    for (let i = 0; i <= 4; i++) {
+      const val = tempMin + (tempMax - tempMin) * (i / 4);
+      const y = heightCSS - padding.bottom - (chartHeight * i / 4);
+      ctx.fillText(val.toFixed(1) + '°', widthCSS - padding.right + 5, y + 3);
+    }
+
+    // X-axis time labels
+    ctx.fillStyle = '#008800';
+    ctx.textAlign = 'center';
+    const timePoints = [0, Math.floor(sensorData.length / 2), sensorData.length - 1];
+    timePoints.forEach(idx => {
+      if (idx >= sensorData.length) return;
+      const d = new Date(sensorData[idx].ts);
+      const label = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+      const x = padding.left + (chartWidth * idx / (sensorData.length - 1));
+      ctx.fillText(label, x, heightCSS - padding.bottom + 15);
+    });
+
+    // Draw CO2 line (green)
+    ctx.strokeStyle = '#00ff00';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    sensorData.forEach((d, i) => {
+      if (d.co2 == null) return;
+      const x = padding.left + (chartWidth * i / (sensorData.length - 1));
+      const y = heightCSS - padding.bottom - ((d.co2 - co2Min) / (co2Max - co2Min)) * chartHeight;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Draw temperature line (orange)
+    ctx.strokeStyle = '#ff6600';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    sensorData.forEach((d, i) => {
+      if (d.temp == null) return;
+      const x = padding.left + (chartWidth * i / (sensorData.length - 1));
+      const y = heightCSS - padding.bottom - ((d.temp - tempMin) / (tempMax - tempMin)) * chartHeight;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Legend
+    ctx.font = '10px "Courier New", monospace';
+    ctx.fillStyle = '#00ff00';
+    ctx.textAlign = 'left';
+    ctx.fillText('■ CO2 (ppm)', padding.left, 12);
+    ctx.fillStyle = '#ff6600';
+    ctx.fillText('■ Temp (°C)', padding.left + 80, 12);
   }
 
   function init() {
     updateClock();
-    updateSensors();
-    drawTrend();
-
-    // Timers
     setInterval(updateClock, 1000);
-    setInterval(updateSensors, 3000);
 
-    // Keep canvas sized correctly
+    // Initial fetch
+    fetchSensorData();
+
+    // Poll for updates
+    setInterval(fetchSensorData, POLL_INTERVAL);
+
+    // Resize handling
     window.addEventListener('resize', drawTrend);
     window.addEventListener('orientationchange', drawTrend);
   }
