@@ -181,6 +181,16 @@ body {
   margin-left: 4px;
 }
 
+.sensor-value.warning {
+  color: #cfcf00;
+  text-shadow: 0 0 5px rgba(207, 207, 0, 0.4);
+}
+
+.sensor-value.critical {
+  color: #cf5050;
+  text-shadow: 0 0 5px rgba(207, 80, 80, 0.4);
+}
+
 /* Alarm Panel */
 .alarm-list {
   max-height: 150px;

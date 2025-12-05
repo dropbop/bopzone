@@ -165,12 +165,23 @@
     
     if (co2El && latest.co2 != null) {
       co2El.textContent = String(latest.co2).padStart(4, '0');
+      // CO2: yellow > 700, red > 1200
+      co2El.parentElement.classList.remove('warning', 'critical');
+      if (latest.co2 > 1200) co2El.parentElement.classList.add('critical');
+      else if (latest.co2 > 700) co2El.parentElement.classList.add('warning');
     }
     if (tempEl && latest.temp != null) {
       tempEl.textContent = latest.temp.toFixed(1);
+      // Temp: yellow > 23.3°C (74°F), red > 24.4°C (76°F)
+      tempEl.parentElement.classList.remove('warning', 'critical');
+      if (latest.temp > 24.4) tempEl.parentElement.classList.add('critical');
+      else if (latest.temp > 23.3) tempEl.parentElement.classList.add('warning');
     }
     if (humidityEl && latest.humidity != null) {
       humidityEl.textContent = latest.humidity.toFixed(1);
+      // Humidity: red > 80%
+      humidityEl.parentElement.classList.remove('warning', 'critical');
+      if (latest.humidity > 80) humidityEl.parentElement.classList.add('critical');
     }
 
     // Update last update timestamp (converted to US Central Time)
@@ -187,6 +198,13 @@
       const minute = pad2(central.getMinutes());
       const second = pad2(central.getSeconds());
       lastUpdateEl.textContent = `${hour}:${minute}.${second} ${ampm}`;
+
+      // Last Update: yellow > 5 min, red > 15 min stale
+      const ageMs = Date.now() - d.getTime();
+      const ageMin = ageMs / 60000;
+      lastUpdateEl.parentElement.classList.remove('warning', 'critical');
+      if (ageMin > 15) lastUpdateEl.parentElement.classList.add('critical');
+      else if (ageMin > 5) lastUpdateEl.parentElement.classList.add('warning');
     }
   }
 
