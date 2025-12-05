@@ -61,10 +61,11 @@
       const day = pad2(central.getDate());
       const year = String(central.getFullYear()).slice(-2);
       let hour = central.getHours();
-      const ampm = hour >= 12 ? 'p' : 'a';
+      const ampm = hour >= 12 ? 'pm' : 'am';
       hour = hour % 12 || 12;
       const minute = pad2(central.getMinutes());
-      lastUpdateEl.textContent = `${hour}:${minute}${ampm}`;
+      const second = pad2(central.getSeconds());
+      lastUpdateEl.textContent = `${hour}:${minute}.${second} ${ampm}`;
     }
   }
 
