@@ -227,6 +227,20 @@ body {
   50% { background: #ff6666; }
 }
 
+/* Acknowledged (pre-reset) alarm rows */
+.alarm-row.acknowledged {
+  opacity: 0.5;
+  animation: none;
+}
+
+.alarm-row.acknowledged.critical {
+  background: #804040;
+}
+
+.alarm-row.acknowledged.warning {
+  background: #808040;
+}
+
 /* LED Indicators */
 .led-panel {
   display: flex;

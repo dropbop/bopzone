@@ -70,24 +70,33 @@
       return;
     }
 
+    // Get the last reset timestamp to mark acknowledged events
+    const lastReset = getLastResetTimestamp(eventData);
+
     // eventData is already sorted DESC by the API, but we want to show newest first
     // Limit to 20 most recent for display
     const displayEvents = eventData.slice(0, 20);
 
     displayEvents.forEach(event => {
       const row = document.createElement('div');
+      const eventTime = new Date(event.ts);
+      const isAcknowledged = lastReset && eventTime <= lastReset;
+
       row.className = `alarm-row ${getEventClass(event.event_type)}`;
-      
+      if (isAcknowledged) {
+        row.classList.add('acknowledged');
+      }
+
       const timeSpan = document.createElement('span');
       timeSpan.textContent = formatTimestamp(event.ts);
-      
+
       const typeSpan = document.createElement('span');
       typeSpan.textContent = event.event_type.toUpperCase();
-      
+
       const msgSpan = document.createElement('span');
       msgSpan.textContent = event.message;
       msgSpan.title = `Uptime: ${formatUptime(event.uptime)} | Heap: ${event.heap} bytes | Measurements: ${event.total_measurements}`;
-      
+
       row.appendChild(timeSpan);
       row.appendChild(typeSpan);
       row.appendChild(msgSpan);
@@ -117,14 +126,29 @@
     return `${secs}s`;
   }
 
+  function getLastResetTimestamp(events) {
+    // Find the most recent info event - this marks when alarms were "reset"
+    const infoEvent = events.find(e => e.event_type === 'info');
+    if (!infoEvent) return null;
+    return new Date(infoEvent.ts);
+  }
+
   function updateEventLed() {
-    // Check for recent errors/critical events (last hour)
+    // Check for recent errors/critical events (last hour, after last reset)
     const oneHourAgo = new Date(Date.now() - 3600000);
-    const recentCritical = eventData.some(e => 
-      (e.event_type === 'critical' || e.event_type === 'error') && 
-      new Date(e.ts) > oneHourAgo
-    );
-    
+    const lastReset = getLastResetTimestamp(eventData);
+
+    // Only count alarms that occurred after the last reset (info event)
+    const isActiveAlarm = (e) => {
+      if (e.event_type !== 'critical' && e.event_type !== 'error') return false;
+      const eventTime = new Date(e.ts);
+      if (eventTime <= oneHourAgo) return false;
+      if (lastReset && eventTime <= lastReset) return false;
+      return true;
+    };
+
+    const recentCritical = eventData.some(isActiveAlarm);
+
     const alarmLed = document.querySelector('[aria-label="Alarm status"] .led');
     if (alarmLed) {
       alarmLed.classList.remove('green-on', 'red-on', 'yellow-on');
@@ -135,10 +159,7 @@
 
     // Update alarm count in panel title
     const alarmTitle = document.querySelector('.panel .panel-title span:last-child');
-    const activeAlarms = eventData.filter(e => 
-      (e.event_type === 'critical' || e.event_type === 'error') && 
-      new Date(e.ts) > oneHourAgo
-    ).length;
+    const activeAlarms = eventData.filter(isActiveAlarm).length;
     
     // Find the alarm panel title and update count
     const alarmPanels = document.querySelectorAll('.panel-title');
