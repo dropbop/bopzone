@@ -80,7 +80,7 @@
     displayEvents.forEach(event => {
       const row = document.createElement('div');
       const eventTime = new Date(event.ts);
-      const isAcknowledged = lastReset && eventTime <= lastReset;
+      const isAcknowledged = lastReset && eventTime < lastReset && event.event_type !== 'info';
 
       row.className = `alarm-row ${getEventClass(event.event_type)}`;
       if (isAcknowledged) {
