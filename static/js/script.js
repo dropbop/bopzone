@@ -8,6 +8,7 @@
 
   let sensorData = [];
   let eventData = [];
+  let lastCalibrationEvent = null;
 
   function pad2(n) { return String(n).padStart(2, '0'); }
 
@@ -49,6 +50,20 @@
       updateEventLed();
     } catch (err) {
       console.error('Event fetch error:', err);
+    }
+  }
+
+  async function fetchLastCalibration() {
+    try {
+      // Query last 30 days of events to find calibration
+      const res = await fetch(`${API_BASE}/log?device=${DEVICE}&hours=720&limit=100`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const events = await res.json();
+      // Find most recent FRC successful event
+      lastCalibrationEvent = events.find(e => e.message && e.message.includes('FRC successful')) || null;
+      updateLastCalibration();
+    } catch (err) {
+      console.error('Calibration fetch error:', err);
     }
   }
 
@@ -158,20 +173,34 @@
     }
 
     // Update alarm count in panel title
-    const alarmTitle = document.querySelector('.panel .panel-title span:last-child');
     const activeAlarms = eventData.filter(isActiveAlarm).length;
-    
-    // Find the alarm panel title and update count
-    const alarmPanels = document.querySelectorAll('.panel-title');
-    alarmPanels.forEach(panel => {
-      if (panel.textContent.includes('Alarm Summary')) {
-        const countSpan = panel.querySelector('span:last-child');
-        if (countSpan) {
-          countSpan.textContent = `${activeAlarms} ACTIVE`;
-          countSpan.style.color = activeAlarms > 0 ? '#ff0000' : 'inherit';
-        }
-      }
-    });
+    const alarmCountSpan = document.getElementById('alarm-count');
+    if (alarmCountSpan) {
+      alarmCountSpan.textContent = `${activeAlarms} ACTIVE`;
+      alarmCountSpan.style.color = activeAlarms > 0 ? '#ff0000' : 'inherit';
+    }
+
+    // Update last calibration date
+    updateLastCalibration();
+  }
+
+  function updateLastCalibration() {
+    const lastCalSpan = document.getElementById('last-cal');
+    if (!lastCalSpan) return;
+
+    // Check recent events first (may have just calibrated)
+    const recentFrc = eventData.find(e => e.message && e.message.includes('FRC successful'));
+    const frcEvent = recentFrc || lastCalibrationEvent;
+
+    if (frcEvent) {
+      const calDate = new Date(frcEvent.ts);
+      const yyyy = calDate.getFullYear();
+      const mm = String(calDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(calDate.getDate()).padStart(2, '0');
+      lastCalSpan.textContent = `${yyyy}-${mm}-${dd}`;
+    } else {
+      lastCalSpan.textContent = '----';
+    }
   }
 
   function updateSensorDisplay() {
@@ -416,6 +445,7 @@
     // Initial fetch
     fetchSensorData();
     fetchEvents();
+    fetchLastCalibration();
 
     // Poll for updates
     setInterval(fetchSensorData, POLL_INTERVAL);
