@@ -243,12 +243,12 @@
       const second = pad2(central.getSeconds());
       lastUpdateEl.textContent = `${hour}:${minute}.${second} ${ampm}`;
 
-      // Last Update: yellow > 5 min, red > 15 min stale
+      // Last Update: yellow > 15 min, red > 25 min stale (adjusted for 10-min batching)
       const ageMs = Date.now() - d.getTime();
       const ageMin = ageMs / 60000;
       lastUpdateEl.parentElement.classList.remove('warning', 'critical');
-      if (ageMin > 15) lastUpdateEl.parentElement.classList.add('critical');
-      else if (ageMin > 5) lastUpdateEl.parentElement.classList.add('warning');
+      if (ageMin > 25) lastUpdateEl.parentElement.classList.add('critical');
+      else if (ageMin > 15) lastUpdateEl.parentElement.classList.add('warning');
     }
   }
 
@@ -377,10 +377,10 @@
     ctx.fillStyle = '#ff6600';
     ctx.fillText('■ Temp (°C)', padding.left + 80, 12);
 
-    // Connection lost overlay if data is stale (>10 minutes)
+    // Connection lost overlay if data is stale (>15 minutes, adjusted for 10-min batching)
     const latest = sensorData[sensorData.length - 1];
     const ageMs = Date.now() - new Date(latest.ts).getTime();
-    if (ageMs > 600000) {
+    if (ageMs > 900000) {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
       ctx.fillRect(0, 0, widthCSS, heightCSS);
       ctx.fillStyle = '#ff0000';
