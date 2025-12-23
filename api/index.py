@@ -55,6 +55,43 @@ def ingest():
     finally:
         conn.close()
 
+@app.route('/api/sensor/batch', methods=['POST'])
+def ingest_batch():
+    """Receive batched readings from ESP32"""
+    token = request.headers.get('X-Sensor-Token')
+    if token != SENSOR_TOKEN:
+        return jsonify({"error": "unauthorized"}), 401
+
+    data = request.get_json()
+    if not data or 'readings' not in data:
+        return jsonify({"error": "no readings"}), 400
+
+    device = data.get('device')
+    readings = data.get('readings', [])
+
+    if not readings:
+        return jsonify({"status": "ok", "inserted": 0})
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"error": "db connection failed"}), 500
+
+    try:
+        with conn.cursor() as cur:
+            # Bulk insert using executemany
+            cur.executemany(
+                """INSERT INTO readings (device, co2, temp, humidity, created_at)
+                   VALUES (%s, %s, %s, %s, %s)""",
+                [(device, r['co2'], r['temp'], r['humidity'], r['ts']) for r in readings]
+            )
+        logger.info(f"Batch insert: {len(readings)} readings for {device}")
+        return jsonify({"status": "ok", "inserted": len(readings)})
+    except Exception as e:
+        logger.error(f"Batch insert error: {e}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
 @app.route('/api/sensor', methods=['GET'])
 def fetch():
     device = request.args.get('device', 'office')
