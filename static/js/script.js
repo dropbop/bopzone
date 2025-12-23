@@ -3,8 +3,8 @@
 
   const API_BASE = '/api/sensor';
   const DEVICE = 'office';
-  const POLL_INTERVAL = 60000; // refresh every 60 seconds
-  const EVENT_POLL_INTERVAL = 30000; // refresh events every 30 seconds
+  const POLL_INTERVAL = 120000; // refresh every 2 minutes
+  const EVENT_POLL_INTERVAL = 60000; // refresh events every 1 minute
 
   let sensorData = [];
   let eventData = [];
@@ -55,12 +55,11 @@
 
   async function fetchLastCalibration() {
     try {
-      // Query last 30 days of events to find calibration
-      const res = await fetch(`${API_BASE}/log?device=${DEVICE}&hours=720&limit=100`);
+      const res = await fetch(`${API_BASE}/calibration?device=${DEVICE}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const events = await res.json();
-      // Find most recent FRC successful event
-      lastCalibrationEvent = events.find(e => e.message && e.message.includes('FRC successful')) || null;
+      const data = await res.json();
+      // Store the date string directly (or null)
+      lastCalibrationEvent = data.date ? { ts: data.date } : null;
       updateLastCalibration();
     } catch (err) {
       console.error('Calibration fetch error:', err);
@@ -179,27 +178,22 @@
       alarmCountSpan.textContent = `${activeAlarms} ACTIVE`;
       alarmCountSpan.style.color = activeAlarms > 0 ? '#ff0000' : 'inherit';
     }
-
-    // Update last calibration date
-    updateLastCalibration();
   }
 
   function updateLastCalibration() {
     const lastCalSpan = document.getElementById('last-cal');
     if (!lastCalSpan) return;
 
-    // Check recent events first (may have just calibrated)
-    const recentFrc = eventData.find(e => e.message && e.message.includes('FRC successful'));
-    const frcEvent = recentFrc || lastCalibrationEvent;
-
-    if (frcEvent) {
-      const calDate = new Date(frcEvent.ts);
+    if (lastCalibrationEvent && lastCalibrationEvent.ts) {
+      const calDate = new Date(lastCalibrationEvent.ts);
       const yyyy = calDate.getFullYear();
       const mm = String(calDate.getMonth() + 1).padStart(2, '0');
       const dd = String(calDate.getDate()).padStart(2, '0');
       lastCalSpan.textContent = `${yyyy}-${mm}-${dd}`;
+      lastCalSpan.style.color = '';
     } else {
-      lastCalSpan.textContent = '----';
+      lastCalSpan.textContent = 'ERR';
+      lastCalSpan.style.color = '#ff0000';
     }
   }
 
