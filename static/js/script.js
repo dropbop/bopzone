@@ -376,6 +376,18 @@
     ctx.fillText('■ CO2 (ppm)', padding.left, 12);
     ctx.fillStyle = '#ff6600';
     ctx.fillText('■ Temp (°C)', padding.left + 80, 12);
+
+    // Connection lost overlay if data is stale (>10 minutes)
+    const latest = sensorData[sensorData.length - 1];
+    const ageMs = Date.now() - new Date(latest.ts).getTime();
+    if (ageMs > 600000) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillRect(0, 0, widthCSS, heightCSS);
+      ctx.fillStyle = '#ff0000';
+      ctx.font = 'bold 24px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('CONNECTION LOST', widthCSS / 2, heightCSS / 2);
+    }
   }
 
   function openPopup(title) {
