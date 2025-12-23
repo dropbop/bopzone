@@ -127,7 +127,7 @@ def log_event():
             device = data.get('device')
             cache_key = f"calibration:{device}"
             result = {"date": datetime.now(timezone.utc).isoformat()}
-            _cache[cache_key] = (result, time.time() + 86400 * 365)
+            _cache[cache_key] = (result, time.time() + 3600)
             logger.info(f"Calibration cache updated for {device}")
 
         return jsonify({"status": "ok"})
@@ -231,8 +231,8 @@ def fetch_calibration():
         else:
             result = {"date": None}
 
-        # Cache forever (until next calibration updates it)
-        _cache[cache_key] = (result, time.time() + 86400 * 365)
+        # Cache for 1 hour (serverless instances don't share memory)
+        _cache[cache_key] = (result, time.time() + 3600)
         return jsonify(result)
     except Exception as e:
         logger.error(f"Calibration fetch error: {e}")
