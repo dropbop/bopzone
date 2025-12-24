@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 
 def get_db_connection():
     try:
-        database_url = os.getenv('DATABASE_URL')
+        database_url = os.getenv('BACKUP_DATABASE_URL')
         if not database_url:
-            logger.error("DATABASE_URL not set")
+            logger.error("BACKUP_DATABASE_URL not set")
             return None
         conn = psycopg2.connect(database_url)
         conn.autocommit = True
