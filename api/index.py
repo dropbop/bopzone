@@ -104,12 +104,17 @@ def fetch():
             return None
         try:
             with conn.cursor() as cur:
+                # Fetch relative to the most recent reading, not NOW()
+                # This ensures the graph shows data even when sensor is offline
                 cur.execute("""
                     SELECT co2, temp, humidity, created_at
                     FROM readings
-                    WHERE device = %s AND created_at > NOW() - INTERVAL '%s hours'
+                    WHERE device = %s
+                      AND created_at > (
+                          SELECT MAX(created_at) FROM readings WHERE device = %s
+                      ) - INTERVAL '%s hours'
                     ORDER BY created_at ASC
-                """, (device, hours))
+                """, (device, device, hours))
                 rows = cur.fetchall()
             return [
                 {"co2": r[0], "temp": r[1], "humidity": r[2], "ts": r[3].isoformat()}
