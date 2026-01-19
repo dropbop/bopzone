@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const API_BASE = 'https://thinkpad.tail824ac3.ts.net/api/sensor';
+  const API_BASE = '/api/sensor';
   const DEVICE = 'office';
   const POLL_INTERVAL = 120000; // refresh every 2 minutes
   const EVENT_POLL_INTERVAL = 60000; // refresh events every 1 minute
