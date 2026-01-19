@@ -10,6 +10,57 @@
   let eventData = [];
   let lastCalibrationEvent = null;
 
+  // Unit preference settings
+  const DEFAULT_SETTINGS = { tempUnit: 'C', humidityUnit: 'RH' };
+  // humidityUnit: 'RH' = %RH, 'AH_METRIC' = g/m³, 'AH_IMPERIAL' = gr/lb
+  let settings = { ...DEFAULT_SETTINGS };
+
+  function loadSettings() {
+    settings.tempUnit = localStorage.getItem('scada_tempUnit') || DEFAULT_SETTINGS.tempUnit;
+    settings.humidityUnit = localStorage.getItem('scada_humidityUnit') || DEFAULT_SETTINGS.humidityUnit;
+  }
+
+  function saveSettings() {
+    localStorage.setItem('scada_tempUnit', settings.tempUnit);
+    localStorage.setItem('scada_humidityUnit', settings.humidityUnit);
+  }
+
+  // Temperature conversions
+  function celsiusToFahrenheit(c) { return (c * 9/5) + 32; }
+  function convertTemp(tempC) { return settings.tempUnit === 'F' ? celsiusToFahrenheit(tempC) : tempC; }
+  function getTempUnit() { return settings.tempUnit === 'F' ? '°F' : '°C'; }
+
+  // Humidity conversions
+  // Magnus formula: AH (g/m³) = (6.112 × e^((17.67×T)/(T+243.5)) × RH × 2.1674) / (273.15 + T)
+  function relativeToAbsoluteHumidity(rhPercent, tempC) {
+    const saturationPressure = 6.112 * Math.exp((17.67 * tempC) / (tempC + 243.5));
+    return (saturationPressure * rhPercent * 2.1674) / (273.15 + tempC);
+  }
+
+  // Convert g/m³ to grains/lb (1 g/m³ ≈ 7 gr/lb at standard conditions)
+  function gramsToGrains(gPerM3) { return gPerM3 * 7; }
+
+  function convertHumidity(rhPercent, tempC) {
+    if (settings.humidityUnit === 'RH') return rhPercent;
+    const ahMetric = relativeToAbsoluteHumidity(rhPercent, tempC);
+    return settings.humidityUnit === 'AH_IMPERIAL' ? gramsToGrains(ahMetric) : ahMetric;
+  }
+
+  function getHumidityUnit() {
+    if (settings.humidityUnit === 'AH_METRIC') return 'g/m³';
+    if (settings.humidityUnit === 'AH_IMPERIAL') return 'gr/lb';
+    return '%RH';
+  }
+
+  function applySettings() {
+    const tempUnitEl = document.getElementById('temp-unit');
+    const humidityUnitEl = document.getElementById('humidity-unit');
+    if (tempUnitEl) tempUnitEl.textContent = getTempUnit();
+    if (humidityUnitEl) humidityUnitEl.textContent = getHumidityUnit();
+    updateSensorDisplay();
+    drawTrend();
+  }
+
   function pad2(n) { return String(n).padStart(2, '0'); }
 
   function updateClock() {
@@ -215,17 +266,21 @@
       else if (latest.co2 > 700) co2El.parentElement.classList.add('warning');
     }
     if (tempEl && latest.temp != null) {
-      tempEl.textContent = latest.temp.toFixed(1);
-      // Temp: yellow > 23.3°C (74°F), red > 24.4°C (76°F)
+      const displayTemp = convertTemp(latest.temp);
+      tempEl.textContent = displayTemp.toFixed(1);
+      // Temp thresholds in Celsius: yellow > 23.3°C, red > 24.4°C
       tempEl.parentElement.classList.remove('warning', 'critical');
       if (latest.temp > 24.4) tempEl.parentElement.classList.add('critical');
       else if (latest.temp > 23.3) tempEl.parentElement.classList.add('warning');
     }
     if (humidityEl && latest.humidity != null) {
-      humidityEl.textContent = latest.humidity.toFixed(1);
-      // Humidity: red > 80%
+      const displayHumidity = convertHumidity(latest.humidity, latest.temp);
+      humidityEl.textContent = displayHumidity.toFixed(1);
+      // Humidity warning only applies to %RH mode
       humidityEl.parentElement.classList.remove('warning', 'critical');
-      if (latest.humidity > 80) humidityEl.parentElement.classList.add('critical');
+      if (settings.humidityUnit === 'RH' && latest.humidity > 80) {
+        humidityEl.parentElement.classList.add('critical');
+      }
     }
 
     // Update last update timestamp (converted to US Central Time)
@@ -326,9 +381,10 @@
     ctx.fillStyle = '#ff6600';
     ctx.textAlign = 'left';
     for (let i = 0; i <= 4; i++) {
-      const val = tempMin + (tempMax - tempMin) * (i / 4);
+      const valCelsius = tempMin + (tempMax - tempMin) * (i / 4);
+      const displayVal = convertTemp(valCelsius);
       const y = heightCSS - padding.bottom - (chartHeight * i / 4);
-      ctx.fillText(val.toFixed(1) + '°', widthCSS - padding.right + 5, y + 3);
+      ctx.fillText(displayVal.toFixed(1) + '°', widthCSS - padding.right + 5, y + 3);
     }
 
     // X-axis time labels
@@ -375,8 +431,60 @@
     ctx.textAlign = 'left';
     ctx.fillText('■ CO2 (ppm)', padding.left, 12);
     ctx.fillStyle = '#ff6600';
-    ctx.fillText('■ Temp (°C)', padding.left + 80, 12);
+    ctx.fillText('■ Temp (' + getTempUnit() + ')', padding.left + 80, 12);
 
+  }
+
+  function renderConfigPopup(container) {
+    container.innerHTML = `
+      <div class="config-section">
+        <div class="config-label">Temperature Unit</div>
+        <div class="config-options">
+          <label class="config-radio">
+            <input type="radio" name="tempUnit" value="C" ${settings.tempUnit === 'C' ? 'checked' : ''}>
+            Celsius (°C)
+          </label>
+          <label class="config-radio">
+            <input type="radio" name="tempUnit" value="F" ${settings.tempUnit === 'F' ? 'checked' : ''}>
+            Fahrenheit (°F)
+          </label>
+        </div>
+      </div>
+      <div class="config-section">
+        <div class="config-label">Humidity Unit</div>
+        <div class="config-options">
+          <label class="config-radio">
+            <input type="radio" name="humidityUnit" value="RH" ${settings.humidityUnit === 'RH' ? 'checked' : ''}>
+            Relative (%RH)
+          </label>
+          <label class="config-radio">
+            <input type="radio" name="humidityUnit" value="AH_METRIC" ${settings.humidityUnit === 'AH_METRIC' ? 'checked' : ''}>
+            Absolute (g/m³)
+          </label>
+          <label class="config-radio">
+            <input type="radio" name="humidityUnit" value="AH_IMPERIAL" ${settings.humidityUnit === 'AH_IMPERIAL' ? 'checked' : ''}>
+            Absolute (gr/lb)
+          </label>
+        </div>
+      </div>
+    `;
+
+    // Add event listeners for immediate apply
+    container.querySelectorAll('input[name="tempUnit"]').forEach(input => {
+      input.addEventListener('change', (e) => {
+        settings.tempUnit = e.target.value;
+        saveSettings();
+        applySettings();
+      });
+    });
+
+    container.querySelectorAll('input[name="humidityUnit"]').forEach(input => {
+      input.addEventListener('change', (e) => {
+        settings.humidityUnit = e.target.value;
+        saveSettings();
+        applySettings();
+      });
+    });
   }
 
   function openPopup(title) {
@@ -403,6 +511,11 @@
     // Create body
     const body = document.createElement('div');
     body.className = 'popup-body';
+
+    // Populate body based on popup type
+    if (title === 'Config') {
+      renderConfigPopup(body);
+    }
 
     popup.appendChild(titlebar);
     popup.appendChild(body);
@@ -434,6 +547,10 @@
   }
 
   function init() {
+    // Load saved settings first
+    loadSettings();
+    applySettings();
+
     updateClock();
     setInterval(updateClock, 1000);
 

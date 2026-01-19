@@ -468,6 +468,42 @@ body {
   background: var(--panel);
 }
 
+/* Config Popup Styles */
+.config-section {
+  margin-bottom: 16px;
+  border: 1px solid;
+  border-color: #808080 #ffffff #ffffff #808080;
+  padding: 8px;
+  background: #e0e0e0;
+}
+
+.config-label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #000080;
+}
+
+.config-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.config-radio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.config-radio input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .container { grid-template-columns: 1fr; }
