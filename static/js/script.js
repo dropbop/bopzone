@@ -109,7 +109,7 @@
 
       const msgSpan = document.createElement('span');
       msgSpan.textContent = event.message;
-      msgSpan.title = `Uptime: ${formatUptime(event.uptime)} | Heap: ${event.heap} bytes | Measurements: ${event.total_measurements}`;
+      msgSpan.title = `Uptime: ${formatUptime(event.uptime)} | Heap: ${event.heap ?? 'N/A'} | Measurements: ${event.total_measurements ?? 'N/A'} | I2C Errors: ${event.i2c_errors ?? 'N/A'}`;
 
       row.appendChild(timeSpan);
       row.appendChild(typeSpan);
