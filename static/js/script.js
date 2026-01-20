@@ -99,9 +99,25 @@
       eventData = await res.json();
       updateEventDisplay();
       updateEventLed();
+
+      // Update calibration date from events if endpoint failed
+      if (!lastCalibrationEvent && eventData.length > 0) {
+        lastCalibrationEvent = findLastFRCEvent(eventData);
+        if (lastCalibrationEvent) updateLastCalibration();
+      }
     } catch (err) {
       console.error('Event fetch error:', err);
     }
+  }
+
+  // Find the most recent FRC success event in event data
+  function findLastFRCEvent(events) {
+    const frcEvent = events.find(e =>
+      e.event_type === 'info' &&
+      e.message &&
+      e.message.includes('FRC successful')
+    );
+    return frcEvent ? { ts: frcEvent.ts } : null;
   }
 
   async function fetchLastCalibration() {
@@ -111,9 +127,20 @@
       const data = await res.json();
       // Store the date string directly (or null)
       lastCalibrationEvent = data.date ? { ts: data.date } : null;
+
+      // Fallback: if no date from endpoint, try parsing event log
+      if (!lastCalibrationEvent && eventData.length > 0) {
+        lastCalibrationEvent = findLastFRCEvent(eventData);
+      }
+
       updateLastCalibration();
     } catch (err) {
       console.error('Calibration fetch error:', err);
+      // Still try event fallback on error
+      if (eventData.length > 0) {
+        lastCalibrationEvent = findLastFRCEvent(eventData);
+        updateLastCalibration();
+      }
     }
   }
 
