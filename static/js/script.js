@@ -94,7 +94,7 @@
 
   async function fetchEvents() {
     try {
-      const res = await fetch(`${API_BASE}/log?device=${DEVICE}&hours=48&limit=50`);
+      const res = await fetch(`${API_BASE}/log?device=${DEVICE}&hours=24&limit=50`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       eventData = await res.json();
       updateEventDisplay();
