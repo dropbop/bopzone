@@ -194,6 +194,7 @@ body {
 /* Alarm Panel */
 .alarm-list {
   min-height: 150px;
+  max-height: 300px;
   flex: 1;
   overflow-y: auto;
   border: 1px solid;
