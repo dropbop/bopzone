@@ -194,7 +194,7 @@ body {
 /* Alarm Panel */
 .alarm-list {
   min-height: 150px;
-  max-height: 150px;
+  flex: 1;
   overflow-y: auto;
   border: 1px solid;
   border-color: #808080 #ffffff #ffffff #808080;
@@ -352,6 +352,17 @@ body {
 
 .wide { grid-column: span 2; }
 .tall { grid-row: span 2; }
+
+.panel.wide {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel.wide .panel-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
 /* Mimic Display */
 .mimic {
