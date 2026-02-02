@@ -129,6 +129,8 @@ body {
   background: var(--panel);
   border: 2px solid;
   border-color: #ffffff #808080 #808080 #ffffff;
+  display: flex;
+  flex-direction: column;
 }
 
 .panel-title {
@@ -144,6 +146,9 @@ body {
 
 .panel-body {
   padding: 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Sensor Display */
@@ -194,7 +199,6 @@ body {
 /* Alarm Panel */
 .alarm-list {
   min-height: 150px;
-  max-height: 300px;
   flex: 1;
   overflow-y: auto;
   border: 1px solid;
@@ -353,17 +357,6 @@ body {
 
 .wide { grid-column: span 2; }
 .tall { grid-row: span 2; }
-
-.panel.wide {
-  display: flex;
-  flex-direction: column;
-}
-
-.panel.wide .panel-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
 
 /* Mimic Display */
 .mimic {
