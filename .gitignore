@@ -1,5 +1,9 @@
 # Claude Code
 .claude/
 
+# Python
+__pycache__/
+*.py[cod]
+
 # ESP32 and Other Project Example Code
 esp32-example/
