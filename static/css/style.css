@@ -326,6 +326,15 @@ body {
   border: 1px solid #000;
 }
 
+/* Self-hosted tile icons (files in /static/icons) */
+.project-icon.icon-koppen {
+  background: url('/static/icons/koppen.png') center / cover no-repeat;
+}
+
+.project-icon.icon-github {
+  background: var(--btn-face) url('/static/icons/github.svg') center / 24px 24px no-repeat;
+}
+
 /* Trend Chart */
 .trend-chart {
   height: 300px;
