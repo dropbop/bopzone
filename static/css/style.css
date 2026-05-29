@@ -331,6 +331,10 @@ body {
   background: url('/static/icons/koppen.png') center / cover no-repeat;
 }
 
+.project-icon.icon-recipes {
+  background: url('/static/icons/recipes.png') center / cover no-repeat;
+}
+
 .project-icon.icon-github {
   background: var(--btn-face) url('/static/icons/github.svg') center / 24px 24px no-repeat;
 }
