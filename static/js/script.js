@@ -514,6 +514,26 @@
     });
   }
 
+  function renderOverviewPopup(container) {
+    container.innerHTML = `
+      <div class="config-section">
+        <div class="config-label">System Overview</div>
+        <p class="overview-text">
+          Environmental monitoring dashboard for the office SCD41 CO2 /
+          temperature / humidity sensor. Live readings, 24-hour trend, and event
+          log are served through a Flask proxy.
+        </p>
+      </div>
+      <div class="config-section">
+        <div class="config-label">Source Code</div>
+        <a class="source-link" href="https://github.com/dropbop/bopzone" target="_blank" rel="noopener noreferrer">
+          <span class="source-link-icon" aria-hidden="true"></span>
+          <span>github.com/dropbop/bopzone</span>
+        </a>
+      </div>
+    `;
+  }
+
   function openPopup(title) {
     // Create overlay
     const overlay = document.createElement('div');
@@ -542,6 +562,8 @@
     // Populate body based on popup type
     if (title === 'Config') {
       renderConfigPopup(body);
+    } else if (title === 'Overview') {
+      renderOverviewPopup(body);
     }
 
     popup.appendChild(titlebar);
