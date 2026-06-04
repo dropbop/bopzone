@@ -6,7 +6,8 @@
   const POLL_INTERVAL = 120000; // refresh every 2 minutes
   const EVENT_POLL_INTERVAL = 60000; // refresh events every 1 minute
   const EVENT_HOURS = 72;
-  const EVENT_LIMIT = 100;
+  const EVENT_LIMIT = 50;
+  const EVENT_DISPLAY_LIMIT = 16;
   const DAY_MS = 24 * 60 * 60 * 1000;
   const CALIBRATION_WARNING_DAYS = 7;
   const CALIBRATION_DUE_DAYS = 30;
@@ -170,9 +171,11 @@
     // Get the last reset timestamp to mark acknowledged events
     const lastReset = getLastResetTimestamp(eventData);
 
-    // eventData is already sorted DESC by the API. Render only rows that fit
-    // in the current panel, avoiding both scrollbars and awkward empty space.
-    for (const event of eventData) {
+    // eventData is already sorted DESC by the API. Show the most recent rows
+    // without making the alarm panel drive the surrounding grid height.
+    const displayEvents = eventData.slice(0, EVENT_DISPLAY_LIMIT);
+
+    displayEvents.forEach(event => {
       const row = document.createElement('div');
       const eventTime = new Date(event.ts);
       const isAcknowledged = lastReset && eventTime < lastReset && event.event_type !== 'info';
@@ -196,14 +199,7 @@
       row.appendChild(typeSpan);
       row.appendChild(msgSpan);
       alarmList.appendChild(row);
-
-      if (alarmList.childElementCount > 1 &&
-          alarmList.clientHeight > 0 &&
-          alarmList.scrollHeight > alarmList.clientHeight + 1) {
-        alarmList.removeChild(row);
-        break;
-      }
-    }
+    });
   }
 
   function getEventClass(eventType) {
@@ -643,9 +639,7 @@
 
     // Resize handling
     window.addEventListener('resize', drawTrend);
-    window.addEventListener('resize', updateEventDisplay);
     window.addEventListener('orientationchange', drawTrend);
-    window.addEventListener('orientationchange', updateEventDisplay);
 
     // Toolbar popup buttons
     initToolbarButtons();
