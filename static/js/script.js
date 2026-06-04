@@ -5,6 +5,11 @@
   const DEVICE = 'office';
   const POLL_INTERVAL = 120000; // refresh every 2 minutes
   const EVENT_POLL_INTERVAL = 60000; // refresh events every 1 minute
+  const EVENT_HOURS = 72;
+  const EVENT_LIMIT = 100;
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const CALIBRATION_WARNING_DAYS = 7;
+  const CALIBRATION_DUE_DAYS = 30;
 
   let sensorData = [];
   let eventData = [];
@@ -94,7 +99,7 @@
 
   async function fetchEvents() {
     try {
-      const res = await fetch(`${API_BASE}/log?device=${DEVICE}&hours=24&limit=50`);
+      const res = await fetch(`${API_BASE}/log?device=${DEVICE}&hours=${EVENT_HOURS}&limit=${EVENT_LIMIT}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       eventData = await res.json();
       updateEventDisplay();
@@ -156,7 +161,7 @@
         <div class="alarm-row normal">
           <span>--:--:--</span>
           <span>INFO</span>
-          <span>No events in the last 24 hours</span>
+          <span>No events available</span>
         </div>
       `;
       return;
@@ -165,11 +170,9 @@
     // Get the last reset timestamp to mark acknowledged events
     const lastReset = getLastResetTimestamp(eventData);
 
-    // eventData is already sorted DESC by the API, but we want to show newest first
-    // Limit to 20 most recent for display
-    const displayEvents = eventData.slice(0, 20);
-
-    displayEvents.forEach(event => {
+    // eventData is already sorted DESC by the API. Render only rows that fit
+    // in the current panel, avoiding both scrollbars and awkward empty space.
+    for (const event of eventData) {
       const row = document.createElement('div');
       const eventTime = new Date(event.ts);
       const isAcknowledged = lastReset && eventTime < lastReset && event.event_type !== 'info';
@@ -193,7 +196,14 @@
       row.appendChild(typeSpan);
       row.appendChild(msgSpan);
       alarmList.appendChild(row);
-    });
+
+      if (alarmList.childElementCount > 1 &&
+          alarmList.clientHeight > 0 &&
+          alarmList.scrollHeight > alarmList.clientHeight + 1) {
+        alarmList.removeChild(row);
+        break;
+      }
+    }
   }
 
   function getEventClass(eventType) {
@@ -264,14 +274,33 @@
 
     if (lastCalibrationEvent && lastCalibrationEvent.ts) {
       const calDate = new Date(lastCalibrationEvent.ts);
+      if (Number.isNaN(calDate.getTime())) {
+        lastCalSpan.textContent = 'ERR';
+        lastCalSpan.style.color = '#ff0000';
+        lastCalSpan.title = 'Calibration date unavailable';
+        return;
+      }
+
       const yyyy = calDate.getFullYear();
       const mm = String(calDate.getMonth() + 1).padStart(2, '0');
       const dd = String(calDate.getDate()).padStart(2, '0');
+      const ageDays = Math.max(0, Math.floor((Date.now() - calDate.getTime()) / DAY_MS));
+
       lastCalSpan.textContent = `${yyyy}-${mm}-${dd}`;
-      lastCalSpan.style.color = '';
+      if (ageDays > CALIBRATION_DUE_DAYS) {
+        lastCalSpan.style.color = '#ff0000';
+        lastCalSpan.title = 'Calibration older than 30 days - calibration needed';
+      } else if (ageDays > CALIBRATION_WARNING_DAYS) {
+        lastCalSpan.style.color = '#ffff00';
+        lastCalSpan.title = 'Calibration older than 7 days';
+      } else {
+        lastCalSpan.style.color = '';
+        lastCalSpan.title = 'Calibration current';
+      }
     } else {
       lastCalSpan.textContent = 'ERR';
       lastCalSpan.style.color = '#ff0000';
+      lastCalSpan.title = 'Calibration date unavailable';
     }
   }
 
@@ -614,7 +643,9 @@
 
     // Resize handling
     window.addEventListener('resize', drawTrend);
+    window.addEventListener('resize', updateEventDisplay);
     window.addEventListener('orientationchange', drawTrend);
+    window.addEventListener('orientationchange', updateEventDisplay);
 
     // Toolbar popup buttons
     initToolbarButtons();

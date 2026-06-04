@@ -200,7 +200,7 @@ body {
 .alarm-list {
   min-height: 150px;
   flex: 1;
-  overflow-y: auto;
+  overflow-y: hidden;
   border: 1px solid;
   border-color: #808080 #ffffff #ffffff #808080;
   background: var(--panel);
