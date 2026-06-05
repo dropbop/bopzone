@@ -5,7 +5,26 @@ import time
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
 TAILSCALE_BASE = 'https://thinkpad.tail824ac3.ts.net'
+# Supported devices. Whitelisting keeps the cache key space bounded and stops
+# arbitrary `device` values from being forwarded upstream on a public deploy.
+ALLOWED_DEVICES = {'office'}
+# Module-level cache: best-effort on Vercel (resets on cold start, not shared
+# across instances). Key space is bounded by the device whitelist + clamped params.
 _cache = {}
+
+
+def normalize_device(value):
+    """Return the device if it's a supported one, else None (callers reject)."""
+    return value if value in ALLOWED_DEVICES else None
+
+
+def clamp_int(value, default, lo, hi):
+    """Coerce a query param to an int within [lo, hi], falling back to default."""
+    try:
+        n = int(value)
+    except (TypeError, ValueError):
+        return default
+    return max(lo, min(hi, n))
 
 
 def get_cached(key, ttl_seconds, fetch_fn):
@@ -31,8 +50,10 @@ def index():
 
 @app.route('/api/sensor')
 def proxy_sensor():
-    device = request.args.get('device', 'office')
-    hours = request.args.get('hours', '24')
+    device = normalize_device(request.args.get('device', 'office'))
+    if device is None:
+        return jsonify({"error": "unknown device"}), 400
+    hours = clamp_int(request.args.get('hours'), 24, 1, 168)
     cache_key = f"sensor:{device}:{hours}"
 
     def fetch():
@@ -50,9 +71,11 @@ def proxy_sensor():
 
 @app.route('/api/sensor/log')
 def proxy_log():
-    device = request.args.get('device', 'office')
-    hours = request.args.get('hours', '24')
-    limit = request.args.get('limit', '50')
+    device = normalize_device(request.args.get('device', 'office'))
+    if device is None:
+        return jsonify({"error": "unknown device"}), 400
+    hours = clamp_int(request.args.get('hours'), 24, 1, 168)
+    limit = clamp_int(request.args.get('limit'), 50, 1, 200)
     cache_key = f"log:{device}:{hours}:{limit}"
 
     def fetch():
@@ -70,7 +93,9 @@ def proxy_log():
 
 @app.route('/api/sensor/calibration')
 def proxy_calibration():
-    device = request.args.get('device', 'office')
+    device = normalize_device(request.args.get('device', 'office'))
+    if device is None:
+        return jsonify({"error": "unknown device"}), 400
     cache_key = f"calibration:{device}"
 
     def fetch():

@@ -197,15 +197,72 @@ body {
 }
 
 /* Alarm Panel */
+.alarm-panel { align-self: start; }
+
 .alarm-list {
+  flex: 0 1 auto;
   min-height: 150px;
-  flex: 1;
-  overflow-y: hidden;
+  max-height: 360px;
+  overflow-y: auto;
   border: 1px solid;
   border-color: #808080 #ffffff #ffffff #808080;
   background: var(--panel);
   font-family: "Courier New", monospace;
   font-size: 10px;
+  /* Firefox: native scrollbar, themed to the panel chrome */
+  scrollbar-width: auto;
+  scrollbar-color: var(--btn-face) #d4d0c8;
+}
+
+/* Win95-style scrollbar (WebKit/Blink) to match the beveled SCADA chrome */
+.alarm-list::-webkit-scrollbar {
+  width: 16px;
+}
+
+/* Dithered checkerboard track, like classic Windows */
+.alarm-list::-webkit-scrollbar-track {
+  background: repeating-conic-gradient(#c0c0c0 0% 25%, #efefef 0% 50%) 0 0 / 2px 2px;
+  border-left: 1px solid #808080;
+}
+
+/* Raised, beveled thumb (button face) */
+.alarm-list::-webkit-scrollbar-thumb {
+  background: var(--btn-face);
+  border: 2px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  min-height: 24px;
+}
+
+.alarm-list::-webkit-scrollbar-thumb:active {
+  border-color: #808080 #ffffff #ffffff #808080;
+}
+
+/* Beveled arrow buttons at each end */
+.alarm-list::-webkit-scrollbar-button:single-button {
+  width: 16px;
+  height: 16px;
+  background-color: var(--btn-face);
+  border: 2px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 8px 8px;
+}
+
+.alarm-list::-webkit-scrollbar-button:single-button:active {
+  border-color: #808080 #ffffff #ffffff #808080;
+}
+
+.alarm-list::-webkit-scrollbar-button:single-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><path d='M4 1 L7 6 L1 6 Z' fill='black'/></svg>");
+}
+
+.alarm-list::-webkit-scrollbar-button:single-button:vertical:increment {
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8'><path d='M1 2 L7 2 L4 7 Z' fill='black'/></svg>");
+}
+
+.alarm-list::-webkit-scrollbar-corner {
+  background: var(--btn-face);
 }
 
 .alarm-row {
@@ -349,16 +406,7 @@ body {
   overflow: hidden;
 }
 
-.trend-grid {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image: 
-    repeating-linear-gradient(0deg, #003300 0, #003300 1px, transparent 1px, transparent 20px),
-    repeating-linear-gradient(90deg, #003300 0, #003300 1px, transparent 1px, transparent 20px);
-}
-
-/* Ensure the canvas overlays the grid and scales with the container */
+/* Canvas fills the chart container; gridlines are drawn on the canvas itself */
 #trend-canvas {
   position: absolute;
   inset: 0;
@@ -366,6 +414,8 @@ body {
   height: 100%;
   display: block;
   z-index: 1;
+  touch-action: none;   /* allow touch-drag to inspect without scrolling */
+  cursor: crosshair;
 }
 
 .wide { grid-column: span 2; }

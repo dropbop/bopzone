@@ -34,7 +34,6 @@
       <div class="panel-title">24-Hour Trend - CO2/Temperature</div>
       <div class="panel-body">
         <div class="trend-chart" role="img" aria-label="CO2/Temperature trend">
-          <div class="trend-grid" aria-hidden="true"></div>
           <canvas id="trend-canvas"></canvas>
         </div>
       </div>
@@ -44,7 +43,7 @@
     <div class="panel">
       <div class="panel-title">
         <span>Environmental Monitor - Office</span>
-        <span style="font-size: 9px;">LIVE | <a href="https://thinkpad.tail824ac3.ts.net/api/sensor?device=office&hours=24" style="color: inherit;">RAW</a></span>
+        <span style="font-size: 9px;">LIVE | <a href="/api/sensor?device=office&hours=24" style="color: inherit;">RAW</a></span>
       </div>
       <div class="panel-body">
         <div class="sensor-grid">
@@ -113,10 +112,10 @@
     </div>
 
     <!-- Alarm Summary - Now Dynamic -->
-    <div class="panel wide">
+    <div class="panel wide alarm-panel">
       <div class="panel-title">
         <span>Alarm Summary</span>
-        <span style="font-size: 9px;"><span id="alarm-count">0 ACTIVE</span> | CALIBRATED: <span id="last-cal">----</span> | <a href="https://thinkpad.tail824ac3.ts.net/api/sensor/log?device=office&hours=72" style="color: inherit;">RAW</a></span>
+        <span style="font-size: 9px;"><span id="alarm-count">0 ACTIVE</span> | CALIBRATED: <span id="last-cal">----</span> | <a href="/api/sensor/log?device=office&hours=72" style="color: inherit;">RAW</a></span>
       </div>
       <div class="panel-body">
         <div id="alarm-list" class="alarm-list" role="log" aria-live="polite">
