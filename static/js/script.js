@@ -449,28 +449,55 @@
     return { min: Math.min(...vals) - padAmt, max: Math.max(...vals) + padAmt };
   }
 
-  // ms to add to a UTC instant to get wall-clock time in tz (handles DST).
-  function tzOffsetMs(date, tz) {
-    const dtf = new Intl.DateTimeFormat('en-US', {
-      timeZone: tz, hour12: false,
-      year: 'numeric', month: '2-digit', day: '2-digit',
-      hour: '2-digit', minute: '2-digit', second: '2-digit'
-    });
+  const CHICAGO_PARTS_FMT = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago', hour12: false,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit'
+  });
+
+  // Chicago wall-clock components for an instant.
+  function chicagoParts(date) {
     const p = {};
-    for (const x of dtf.formatToParts(date)) p[x.type] = x.value;
-    const hour = p.hour === '24' ? 0 : Number(p.hour);
-    const asUTC = Date.UTC(Number(p.year), Number(p.month) - 1, Number(p.day),
-      hour, Number(p.minute), Number(p.second));
-    return asUTC - date.getTime();
+    for (const x of CHICAGO_PARTS_FMT.formatToParts(date)) p[x.type] = x.value;
+    return {
+      y: Number(p.year), mo: Number(p.month), d: Number(p.day),
+      h: p.hour === '24' ? 0 : Number(p.hour),
+      mi: Number(p.minute), s: Number(p.second)
+    };
   }
 
-  // 6h ticks aligned to round Chicago clock hours (00/06/12/18).
+  // Chicago UTC offset (ms to add to a UTC instant to get wall-clock) at `date`.
+  function chicagoOffsetMs(date) {
+    const p = chicagoParts(date);
+    return Date.UTC(p.y, p.mo - 1, p.d, p.h, p.mi, p.s) - date.getTime();
+  }
+
+  // Epoch ms for a given Chicago wall-clock time. Refines once so the offset is
+  // taken at the resulting instant, not the guess (correct across DST edges).
+  function chicagoWallToEpoch(y, mo, d, h) {
+    const utc = Date.UTC(y, mo - 1, d, h, 0, 0);
+    let e = utc - chicagoOffsetMs(new Date(utc));
+    e = utc - chicagoOffsetMs(new Date(e));
+    return e;
+  }
+
+  // 6h ticks aligned to round Chicago clock hours (00/06/12/18), DST-correct:
+  // each tick's offset is computed independently rather than reused across the
+  // window, so ticks before/after a transition stay on round hours.
   function sixHourTicks(g) {
     const SIX_H = 6 * 60 * 60 * 1000;
-    const off = tzOffsetMs(new Date(g.tEnd), 'America/Chicago');
+    const start = chicagoParts(new Date(g.tStart));
+    // UTC counter used purely to step Chicago wall-clock by 6h (00→06→12→18→…).
+    let wall = Date.UTC(start.y, start.mo - 1, start.d, 0, 0, 0);
     const ticks = [];
-    let t = Math.ceil((g.tStart + off) / SIX_H) * SIX_H - off;
-    for (; t <= g.tEnd; t += SIX_H) ticks.push(t);
+    for (let i = 0; i < 16; i++) {
+      const w = new Date(wall);
+      const epoch = chicagoWallToEpoch(w.getUTCFullYear(), w.getUTCMonth() + 1,
+        w.getUTCDate(), w.getUTCHours());
+      if (epoch > g.tEnd) break;
+      if (epoch >= g.tStart) ticks.push(epoch);
+      wall += SIX_H;
+    }
     return ticks;
   }
 
